@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
  *  Main class for ray tracing exercise.
  */
 public class RayTracer {
-
+	// this is a comment
 	public int imageWidth;
 	public int imageHeight;
 	
