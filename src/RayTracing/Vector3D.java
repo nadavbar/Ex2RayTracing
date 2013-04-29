@@ -42,6 +42,11 @@ public class Vector3D
 		return new Vector3D(_x / size, _y / size, _z/size);
 	}
 	
+	public Vector3D multByScalar(double scalar)
+	{
+		return new Vector3D(_x * scalar, _y * scalar, _z * scalar);
+	}
+	
 	public double size()
 	{
 		return Math.sqrt(scalarProduct(this));

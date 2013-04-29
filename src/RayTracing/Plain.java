@@ -1,6 +1,6 @@
 package RayTracing;
 
-public class Plain implements Surface
+public class Plain extends Surface
 {
 	private Vector3D _normal;
 	private double _offset;
@@ -29,11 +29,18 @@ public class Plain implements Surface
 	}
 
 	@Override
-	public double checkIntersection(Ray ray) 
+	public Intersection checkIntersection(Ray ray) 
 	{
-		// TODO: Check if the normal is against the direction of the ray?
 		double t = (ray.getP().scalarProduct(_normal) + _offset) / 
 					(ray.getV().scalarProduct(_normal));
-		return t;
+		
+		if (t < EPSILON)
+		{
+			return null;
+		}
+		
+		Vector3D intersectionPoint = ray.getP0().add(ray.getV().multByScalar(t));
+		
+		return new Intersection(t, intersectionPoint, _normal);
 	}
 }
