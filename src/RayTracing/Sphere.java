@@ -4,25 +4,19 @@ public class Sphere extends Surface
 {
 	public Sphere(double x, double y, double z, double radius, int materialIndex)
 	{
+		super(materialIndex);
 		_center = new Vector3D(x, y, z);
 		_radius = radius;
 		_radiusSquared  = _radius * _radius;
-		_materialIndex = materialIndex;
 	}
 	
 	Vector3D _center;
 	private double _radius;
 	private double _radiusSquared;
-	private int _materialIndex;
 	
 	public Vector3D getCenter()
 	{
 		return _center;
-	}
-	
-	public int getMaterialIndex()
-	{
-		return _materialIndex;
 	}
 	
 	public double getRadius()
@@ -71,6 +65,6 @@ public class Sphere extends Surface
 		
 		// TODO: if the camera is inside the sphere?
 		
-		return new Intersection(t, intersectionPoint, normal);
+		return new Intersection(t, intersectionPoint, normal, this);
 	}
 }

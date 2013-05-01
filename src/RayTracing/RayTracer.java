@@ -17,22 +17,14 @@ import javax.imageio.ImageIO;
  */
 public class RayTracer {
 	// this is a comment
-	public int imageWidth;
-	public int imageHeight;
+	public int _imageWidth;
+	public int _imageHeight;
 	
-	private Camera _camera;
-	private Settings _settings;
-	private ArrayList<Material> _materials;
-	private ArrayList<Sphere> _spheres;
-	private ArrayList<Plain> _plains;
-	private ArrayList<Light> _lights;
+	SceneGenerator _sceneGenerator;
 	
 	public RayTracer()
 	{
-		_materials = new ArrayList<Material>();
-		_spheres = new ArrayList<Sphere>();
-		_plains = new ArrayList<Plain>();
-		_lights = new ArrayList<Light>();
+		
 	}
 
 	/**
@@ -45,8 +37,8 @@ public class RayTracer {
 			RayTracer tracer = new RayTracer();
 
                         // Default values:
-			tracer.imageWidth = 500;
-			tracer.imageHeight = 500;
+			tracer._imageWidth = 500;
+			tracer._imageHeight = 500;
 
 			if (args.length < 2)
 				throw new RayTracerException("Not enough arguments provided. Please specify an input scene file and an output image file for rendering.");
@@ -56,8 +48,8 @@ public class RayTracer {
 
 			if (args.length > 3)
 			{
-				tracer.imageWidth = Integer.parseInt(args[2]);
-				tracer.imageHeight = Integer.parseInt(args[3]);
+				tracer._imageWidth = Integer.parseInt(args[2]);
+				tracer._imageHeight = Integer.parseInt(args[3]);
 			}
 
 
@@ -83,6 +75,13 @@ public class RayTracer {
 	 */
 	public void parseScene(String sceneFileName) throws IOException, RayTracerException
 	{
+		Camera camera = null;
+		Settings settings = null;
+		ArrayList<Material> materials = new ArrayList<Material>();
+		ArrayList<Sphere> spheres = new ArrayList<Sphere>();
+		ArrayList<Plain> plains = new ArrayList<Plain>();
+		ArrayList<Light> lights = new ArrayList<Light>();
+		
 		FileReader fr = new FileReader(sceneFileName);
 
 		BufferedReader r = new BufferedReader(fr);
@@ -109,7 +108,7 @@ public class RayTracer {
 
 				if (code.equals("cam"))
 				{
-					_camera = new Camera(vectorFromParams(params, 0),
+					camera = new Camera(vectorFromParams(params, 0),
 							vectorFromParams(params, 3),
 							vectorFromParams(params, 6),
 							Double.parseDouble(params[9]), Double.parseDouble(params[10]));
@@ -117,7 +116,7 @@ public class RayTracer {
 				}
 				else if (code.equals("set"))
 				{
-					_settings = new Settings(colorFromParams(params, 0), 
+					settings = new Settings(colorFromParams(params, 0), 
 							Integer.parseInt(params[3]), Integer.parseInt(params[4]));
 					System.out.println(String.format("Parsed general settings (line %d)", lineNum));
 				}
@@ -129,7 +128,7 @@ public class RayTracer {
 							Double.parseDouble(params[9]),
 							Double.parseDouble(params[10]),
 							Double.parseDouble(params[11]));
-					_materials.add(material);
+					materials.add(material);
 					System.out.println(String.format("Parsed material (line %d)", lineNum));
 				}
 				else if (code.equals("sph"))
@@ -140,7 +139,7 @@ public class RayTracer {
 							Double.parseDouble(params[3]),
 							Integer.parseInt(params[4]));
 					
-					_spheres.add(sph);
+					spheres.add(sph);
 
 					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
 				}
@@ -149,7 +148,7 @@ public class RayTracer {
 					Plain pln = new Plain(vectorFromParams(params, 0), 
 							Double.parseDouble(params[3]),
 							Integer.parseInt(params[4]));
-					_plains.add(pln);
+					plains.add(pln);
 					System.out.println(String.format("Parsed plane (line %d)", lineNum));
 				}
 				else if (code.equals("lgt"))
@@ -159,7 +158,7 @@ public class RayTracer {
 							Double.parseDouble(params[6]),
 							Double.parseDouble(params[7]),
 							Double.parseDouble(params[8]));
-					_lights.add(lgt);
+					lights.add(lgt);
 					System.out.println(String.format("Parsed light (line %d)", lineNum));
 				}
 				else
@@ -171,7 +170,11 @@ public class RayTracer {
 
                 // It is recommended that you check here that the scene is valid,
                 // for example camera settings and all necessary materials were defined.
-
+		
+		// TODO: check that the scene is valid!!!!
+		_sceneGenerator = new SceneGenerator(camera, settings, materials, spheres, plains, lights,
+											_imageWidth, _imageHeight);
+		
 		System.out.println("Finished parsing scene file " + sceneFileName);
 
 	}
@@ -198,7 +201,7 @@ public class RayTracer {
 		long startTime = System.currentTimeMillis();
 
 		// Create a byte array to hold the pixel data:
-		byte[] rgbData = new byte[this.imageWidth * this.imageHeight * 3];
+		byte[] rgbData = new byte[this._imageWidth * this._imageHeight * 3];
 
 
                 // Put your ray tracing code here!
@@ -209,7 +212,18 @@ public class RayTracer {
                 //             blue component is in rgbData[(y * this.imageWidth + x) * 3 + 2]
                 //
                 // Each of the red, green and blue components should be a byte, i.e. 0-255
-
+		Color[][] rendered = _sceneGenerator.renderScene();
+		
+		for (int i=0; i<_imageHeight; i++)
+		{
+			for (int j=0; j<_imageWidth; j++)
+			{
+				Color color = rendered[i][j];
+				rgbData[(i*_imageWidth + j)*3] = (byte) (color.getRed() * 255);
+				rgbData[(i*_imageWidth + j)*3 + 1] = (byte) (color.getGreen() * 255);
+				rgbData[(i*_imageWidth + j)*3 + 2] = (byte) (color.getBlue() * 255);
+			}
+		}
 
 		long endTime = System.currentTimeMillis();
 		Long renderTime = endTime - startTime;
@@ -219,7 +233,7 @@ public class RayTracer {
 		System.out.println("Finished rendering scene in " + renderTime.toString() + " milliseconds.");
 
                 // This is already implemented, and should work without adding any code.
-		saveImage(this.imageWidth, rgbData, outputFileName);
+		saveImage(this._imageWidth, rgbData, outputFileName);
 
 		System.out.println("Saved file " + outputFileName);
 

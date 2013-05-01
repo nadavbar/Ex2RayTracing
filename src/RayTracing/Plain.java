@@ -4,13 +4,12 @@ public class Plain extends Surface
 {
 	private Vector3D _normal;
 	private double _offset;
-	private int _materialIndex;
 	
 	public Plain(Vector3D normal, double offset, int materialIndex)
 	{
+		super(materialIndex);
 		_normal = normal;
 		_offset = offset;
-		_materialIndex = materialIndex;
 	}
 	
 	public Vector3D getNormal()
@@ -21,11 +20,6 @@ public class Plain extends Surface
 	public double getOffset()
 	{
 		return _offset;
-	}
-	
-	public int getMaterialIndex()
-	{
-		return _materialIndex;
 	}
 
 	@Override
@@ -41,6 +35,6 @@ public class Plain extends Surface
 		
 		Vector3D intersectionPoint = ray.getP0().add(ray.getV().multByScalar(t));
 		
-		return new Intersection(t, intersectionPoint, _normal);
+		return new Intersection(t, intersectionPoint, _normal, this);
 	}
 }
