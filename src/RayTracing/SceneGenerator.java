@@ -1,7 +1,12 @@
 package RayTracing;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+
+import javax.swing.plaf.ListUI;
+
+import org.omg.PortableServer._ServantActivatorStub;
 
 public class SceneGenerator 
 {
@@ -10,10 +15,10 @@ public class SceneGenerator
 	private Camera _camera;
 	private Settings _settings;
 	private ArrayList<Material> _materials;
-	private ArrayList<Surface> _surface;
+	private ArrayList<Surface> _surfaces;
 	private ArrayList<Light> _lights;
 	
-	public SceneGenerator(Camera camera, Settings settings, ArrayList<Surface> surfaces, ArrayList<Material> materials,
+	public SceneGenerator(Camera camera, Settings settings, ArrayList<Material> materials, ArrayList<Surface> surfaces,
 						  ArrayList<Light> lights, int width, int height)
 	{
 		_height = height;;
@@ -21,7 +26,7 @@ public class SceneGenerator
 		_camera = camera;
 		_settings = settings;
 		_materials = materials;
-		_surface = surfaces;
+		_surfaces = surfaces;
 		_lights = lights;
 	}
 	
@@ -36,7 +41,7 @@ public class SceneGenerator
 			for (int j=0; j<_width; j++)
 			{
 				Ray ray = new Ray(_camera.getPosition(), p);
-				ArrayList<Intersection> intersections = getIntersections(ray);
+				ArrayList<Intersection> intersections = getIntersectionsSorted(ray);
 				Color color = getColor(intersections);
 				imageData[i][j] = color;
 				p = p.add(_camera.getVx());
@@ -48,14 +53,43 @@ public class SceneGenerator
 		return imageData;
 	}
 	
-	public ArrayList<Intersection> getIntersections(Ray ray)
+	public ArrayList<Intersection> getIntersectionsSorted(Ray ray)
 	{
-		return null;
+		ArrayList<Intersection> intersections = new ArrayList<Intersection>();
+		
+		for (Surface surface : _surfaces)
+		{
+			Intersection intersection = surface.checkIntersection(ray);
+			if (intersection != null)
+			{
+				intersections.add(intersection);
+			}
+		}
+		
+		Collections.sort(intersections, new IntersectionComperator());
+		return intersections;
 	}
 	
+	// Assume the intersections are sorted
 	public Color getColor(ArrayList<Intersection> intersections)
 	{
-		return null;
+		if (intersections.size() == 0)
+		{
+			return _settings.getBackColor();
+		}
+		
+		Intersection first = intersections.get(0);
+		Material material = getMaterialForSurface(first.getSurface());
+		
+		// TODO: handle transperancy, lighting
+		return material.getReflection();
+	}
+	
+	public Material getMaterialForSurface(Surface surface)
+	{
+		// we assume that everything is valid and the material exists
+		int materialIndex = surface.getMaterialIndex();
+		return _materials.get(materialIndex);		
 	}
 	
 	class IntersectionComperator implements Comparator<Intersection>
