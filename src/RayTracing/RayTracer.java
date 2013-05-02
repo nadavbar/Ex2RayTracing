@@ -62,9 +62,9 @@ public class RayTracer {
 //		} catch (IOException e) {
 //			System.out.println(e.getMessage());
 		} catch (RayTracerException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 
@@ -111,7 +111,7 @@ public class RayTracer {
 							vectorFromParams(params, 3),
 							vectorFromParams(params, 6),
 							Double.parseDouble(params[9]), Double.parseDouble(params[10]));
-					System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
+					//System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
 				}
 				else if (code.equals("set"))
 				{
@@ -128,7 +128,7 @@ public class RayTracer {
 							Double.parseDouble(params[10]),
 							Double.parseDouble(params[11]));
 					materials.add(material);
-					System.out.println(String.format("Parsed material (line %d)", lineNum));
+					//System.out.println(String.format("Parsed material (line %d)", lineNum));
 				}
 				else if (code.equals("sph"))
 				{
@@ -140,7 +140,7 @@ public class RayTracer {
 					
 					surfaces.add(sph);
 
-					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
+					//System.out.println(String.format("Parsed sphere (line %d)", lineNum));
 				}
 				else if (code.equals("pln"))
 				{
@@ -148,7 +148,7 @@ public class RayTracer {
 							Double.parseDouble(params[3]),
 							Integer.parseInt(params[4]));
 					surfaces.add(pln);
-					System.out.println(String.format("Parsed plane (line %d)", lineNum));
+					//System.out.println(String.format("Parsed plane (line %d)", lineNum));
 				}
 				else if (code.equals("lgt"))
 				{
@@ -158,7 +158,7 @@ public class RayTracer {
 							Double.parseDouble(params[7]),
 							Double.parseDouble(params[8]));
 					lights.add(lgt);
-					System.out.println(String.format("Parsed light (line %d)", lineNum));
+					//System.out.println(String.format("Parsed light (line %d)", lineNum));
 				}
 				else
 				{

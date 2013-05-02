@@ -52,5 +52,10 @@ public class Ray
 	public void setP(Vector3D p) 
 	{
 		_p = p;
+		
+		if (_p != null)
+		{
+			_v = _p.sub(_p0);
+		}
 	}
 }

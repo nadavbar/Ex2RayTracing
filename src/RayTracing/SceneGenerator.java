@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import javax.swing.plaf.ListUI;
-
-import org.omg.PortableServer._ServantActivatorStub;
-
 public class SceneGenerator 
 {
 	private int _height;
@@ -33,7 +29,14 @@ public class SceneGenerator
 	public Color[][] renderScene()
 	{
 		Color[][] imageData = new Color[_height][_width];
-		Vector3D p0 = _camera.getCoordinateSytstemP0();
+		//Vector3D p0 = _camera.getCoordinateSytstemP0();
+		
+		Vector3D initial = _camera.getPosition().add(_camera.getVz().multByScalar(_camera.getScreenDistance()));
+		double width = _camera.getScreenWidth();
+		double height = _height * (_camera.getScreenWidth() / _width);
+		System.out.println("initial: " + initial.toString());
+		Vector3D p0 = initial.sub(_camera.getVx().multByScalar(width/2)).sub(_camera.getVy().multByScalar(height/2));
+		System.out.println("p0: " + p0.toString());
 		
 		for (int i=0; i<_height; i++)
 		{
@@ -82,14 +85,14 @@ public class SceneGenerator
 		Material material = getMaterialForSurface(first.getSurface());
 		
 		// TODO: handle transperancy, lighting
-		return material.getReflection();
+		return material.getDiffuse();
 	}
 	
 	public Material getMaterialForSurface(Surface surface)
 	{
 		// we assume that everything is valid and the material exists
 		int materialIndex = surface.getMaterialIndex();
-		return _materials.get(materialIndex);		
+		return _materials.get(materialIndex-1);		
 	}
 	
 	class IntersectionComperator implements Comparator<Intersection>

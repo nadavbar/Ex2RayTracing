@@ -35,6 +35,6 @@ public class Plain extends Surface
 		
 		Vector3D intersectionPoint = ray.getP0().add(ray.getV().multByScalar(t));
 		
-		return new Intersection(t, intersectionPoint, _normal, this);
+		return new Intersection(t, intersectionPoint, _normal, this, ray);
 	}
 }

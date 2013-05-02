@@ -27,13 +27,20 @@ public class Camera
 	
 	private void calculateCoordinateSystem()
 	{
-		_normal = _position.sub(_lookAt);
+		//_normal = _position.sub(_lookAt);
+		System.out.println("camera: " + _position.toString());
+		_normal = _lookAt.sub(_position).normalize();
 		_vz = _normal.normalize();
-		_vx = _normal.crossProduct(_upVector).normalize();
+		System.out.println("vz: " + _vz.toString());
+		_vx = _upVector.crossProduct(_normal).normalize();
+		System.out.println("vx: " + _vx.toString());
 		// TODO: normalize vy?
-		_vy = _vz.crossProduct(_vx);
-		Vector3D p = _position.add(_vz.multByScalar(_screenDistance));
-		_coordinateSystemP0 = p.sub(_vx.sub(_vy).multByScalar(_screenWidth));
+		_vy = _vz.crossProduct(_vx).normalize();
+		System.out.println("vy: " + _vy.toString());
+		/*Vector3D p = _position.add(_vz.multByScalar(_screenDistance));
+		System.out.println("p: " + p.toString());
+		_coordinateSystemP0 = p.sub(_vx.multByScalar(_screenWidth/2)).sub(_vy.multByScalar(_screenWidth/2));
+		System.out.println("p0: " + _coordinateSystemP0.toString());*/
 	}
 	
 	public Vector3D getPosition()

@@ -25,13 +25,13 @@ public class Vector3D
 	
 	public double scalarProduct(Vector3D other)
 	{
-		return _x * other._x + _y + other._y + other._z * _z;
+		return _x * other._x + _y * other._y + other._z * _z;
 	}
 	
 	public Vector3D crossProduct(Vector3D other)
 	{
 		return new Vector3D(_y*other._z - _z*other._y,
-							_z*other._x - _z*other._z,
+							_z*other._x - _x*other._z,
 							_x * other._y - _y*other._x);
 	}
 	
@@ -49,7 +49,8 @@ public class Vector3D
 	
 	public double size()
 	{
-		return Math.sqrt(scalarProduct(this));
+		double sizeSquared = scalarProduct(this);
+		return Math.sqrt(sizeSquared);
 	}
 	
 	public double getX()
@@ -65,5 +66,10 @@ public class Vector3D
 	public double getZ()
 	{
 		return _z;
+	}
+	
+	public String toString()
+	{
+		return String.format("(%.2f,%.2f,%.2f)", _x,_y,_z); 
 	}
 }
