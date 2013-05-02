@@ -78,8 +78,7 @@ public class RayTracer {
 		Camera camera = null;
 		Settings settings = null;
 		ArrayList<Material> materials = new ArrayList<Material>();
-		ArrayList<Sphere> spheres = new ArrayList<Sphere>();
-		ArrayList<Plain> plains = new ArrayList<Plain>();
+		ArrayList<Surface> surfaces = new ArrayList<Surface>();
 		ArrayList<Light> lights = new ArrayList<Light>();
 		
 		FileReader fr = new FileReader(sceneFileName);
@@ -139,7 +138,7 @@ public class RayTracer {
 							Double.parseDouble(params[3]),
 							Integer.parseInt(params[4]));
 					
-					spheres.add(sph);
+					surfaces.add(sph);
 
 					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
 				}
@@ -148,7 +147,7 @@ public class RayTracer {
 					Plain pln = new Plain(vectorFromParams(params, 0), 
 							Double.parseDouble(params[3]),
 							Integer.parseInt(params[4]));
-					plains.add(pln);
+					surfaces.add(pln);
 					System.out.println(String.format("Parsed plane (line %d)", lineNum));
 				}
 				else if (code.equals("lgt"))
@@ -172,7 +171,7 @@ public class RayTracer {
                 // for example camera settings and all necessary materials were defined.
 		
 		// TODO: check that the scene is valid!!!!
-		_sceneGenerator = new SceneGenerator(camera, settings, materials, spheres, plains, lights,
+		_sceneGenerator = new SceneGenerator(camera, settings, materials, surfaces, lights,
 											_imageWidth, _imageHeight);
 		
 		System.out.println("Finished parsing scene file " + sceneFileName);

@@ -1,6 +1,7 @@
 package RayTracing;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class SceneGenerator 
 {
@@ -9,21 +10,18 @@ public class SceneGenerator
 	private Camera _camera;
 	private Settings _settings;
 	private ArrayList<Material> _materials;
-	private ArrayList<Sphere> _spheres;
-	private ArrayList<Plain> _plains;
+	private ArrayList<Surface> _surface;
 	private ArrayList<Light> _lights;
 	
-	public SceneGenerator(Camera camera, Settings settings, ArrayList<Material> materials,
-						  ArrayList<Sphere> spheres, ArrayList<Plain> plains, ArrayList<Light> lights, 
-						  int width, int height)
+	public SceneGenerator(Camera camera, Settings settings, ArrayList<Surface> surfaces, ArrayList<Material> materials,
+						  ArrayList<Light> lights, int width, int height)
 	{
 		_height = height;;
 		_width = width;
 		_camera = camera;
 		_settings = settings;
 		_materials = materials;
-		_spheres = spheres;
-		_plains = plains;
+		_surface = surfaces;
 		_lights = lights;
 	}
 	
@@ -59,4 +57,18 @@ public class SceneGenerator
 	{
 		return null;
 	}
+	
+	class IntersectionComperator implements Comparator<Intersection>
+	{
+		/*
+		 * (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare(Intersection o1, Intersection o2) 
+		{
+			return Double.compare(o1.getT(), o2.getT());
+		}
+	}
 }
+
