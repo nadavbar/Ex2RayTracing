@@ -59,8 +59,8 @@ public class RayTracer {
 			// Render scene:
 			tracer.renderScene(outputFileName);
 
-//		} catch (IOException e) {
-//			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
 		} catch (RayTracerException e) {
 			e.printStackTrace();
 		} catch (Exception e) {

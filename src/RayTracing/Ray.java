@@ -29,7 +29,7 @@ public class Ray
 		
 		if (_p != null)
 		{
-			_v = _p.sub(_p0);
+			_v = _p.sub(_p0).normalize();
 		}
 	}
 
@@ -55,7 +55,7 @@ public class Ray
 		
 		if (_p != null)
 		{
-			_v = _p.sub(_p0);
+			_v = _p.sub(_p0).normalize();
 		}
 	}
 }

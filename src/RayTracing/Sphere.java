@@ -27,7 +27,7 @@ public class Sphere extends Surface
 	@Override
 	public Intersection checkIntersection(Ray ray) 
 	{
-		/*Vector3D L = _center.sub(ray.getP0());
+		Vector3D L = _center.sub(ray.getP0());
 		double tca = L.scalarProduct(ray.getV());
 		
 		if (tca < 0)
@@ -40,21 +40,7 @@ public class Sphere extends Surface
 		
 		double thc = Math.sqrt(_radiusSquared - dsquared);
 		double t1 = tca - thc;
-		double t2 = tca + thc;*/
-		
-		double a = 1d;
-		double b = ray.getV().multByScalar(2).scalarProduct(ray.getP0().sub(_center));
-		Vector3D temp = ray.getP0().sub(_center);
-		double c = temp.scalarProduct(temp) - _radiusSquared;
-		
-		double discreminant = b*b - 4*a*c;
-		
-		if (discreminant < 0)
-			return null;
-		
-		double d = Math.sqrt(discreminant);
-		double t1 = (-b - d)/(2*a);
-		double t2 = (-b + d)/(2*a);
+		double t2 = tca + thc;
 		
 		// find the appropriate intersection point
 		double t;
