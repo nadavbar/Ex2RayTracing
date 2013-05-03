@@ -9,9 +9,6 @@ public class Camera
 	private double _screenWidth;
 	
 	private Vector3D _normal;
-	private Vector3D _vz;
-	private Vector3D _vy;
-	private Vector3D _vx;
 	
 	public Camera(Vector3D position, Vector3D lookAt, Vector3D upVector,
 				  double screenDistance, double screenWidth)
@@ -21,19 +18,7 @@ public class Camera
 		_upVector = upVector;
 		_screenDistance = screenDistance;
 		_screenWidth = screenWidth;
-		calculateCoordinateSystem();
-	}
-	
-	private void calculateCoordinateSystem()
-	{
-		System.out.println("camera: " + _position.toString());
-		_normal = _lookAt.sub(_position).normalize();
-		_vz = _normal.normalize();
-		System.out.println("vz: " + _vz.toString());
-		_vx = _upVector.crossProduct(_vz);
-		System.out.println("vx: " + _vx.toString());
-		_vy = _vx.crossProduct(_vz);
-		System.out.println("vy: " + _vy.toString());
+		_normal = _lookAt.sub(_position);
 	}
 	
 	public Vector3D getPosition()
@@ -61,19 +46,8 @@ public class Camera
 		return _screenWidth;
 	}
 	
-	public Vector3D getVz()
+	public Vector3D getNormal()
 	{
-		return _vz;
+		return _normal;
 	}
-	
-	public Vector3D getVx()
-	{
-		return _vx;
-	}
-	
-	public Vector3D getVy()
-	{
-		return _vy;
-	}
-	
 }

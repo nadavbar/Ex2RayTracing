@@ -30,15 +30,14 @@ public class SceneGenerator
 	{
 		Color[][] imageData = new Color[_height][_width];
 		
-		Vector3D initial = _camera.getPosition().add(_camera.getVz().multByScalar(_camera.getScreenDistance()));
+		ViewPlane cameraViewPlane = new ViewPlane(_camera.getNormal(), _camera.getUpVector());
+		Vector3D initial = _camera.getPosition().add(cameraViewPlane.getVz().multByScalar(_camera.getScreenDistance()));
 		double width = _camera.getScreenWidth();
 		double density = _camera.getScreenWidth() / _width;
 		double height = _height * (_camera.getScreenWidth() / _width);
-		System.out.println("initial: " + initial.toString());
-		Vector3D p0 = initial.sub(_camera.getVx().multByScalar(width/2)).sub(_camera.getVy().multByScalar(height/2));
-		System.out.println("p0: " + p0.toString());
-		Vector3D xStep = _camera.getVx().multByScalar(density);
-		Vector3D yStep = _camera.getVy().multByScalar(density);
+		Vector3D p0 = initial.sub(cameraViewPlane.getVx().multByScalar(width/2)).sub(cameraViewPlane.getVy().multByScalar(height/2));
+		Vector3D xStep = cameraViewPlane.getVx().multByScalar(density);
+		Vector3D yStep = cameraViewPlane.getVy().multByScalar(density);
 		for (int i=0; i<_height; i++)
 		{
 			Vector3D p = p0;
@@ -85,11 +84,6 @@ public class SceneGenerator
 		
 		Color color = new Color(0d, 0d, 0d);
 		
-		if (first.getSurface().getClass() == Sphere.class)
-		{
-			int a = 10;
-		}
-		
 		for (Light lgt : _lights)
 		{
 			Color diffuse = getColorFromLight(first, lgt);
@@ -124,7 +118,17 @@ public class SceneGenerator
 		igreen += material.getSpecular().getGreen() * light.getSpecular() * cosPhiPowered;
 		iblue += material.getSpecular().getBlue() * light.getSpecular() * cosPhiPowered;
 		
+		// TODO: get shadows:
+		
 		return new Color(ired, igreen, iblue);
+	}
+	
+	public double calculateSoftShadow(Vector3D lightVector, Intersection intersection, Light lgt)
+	{
+		// TODO: should we multiply the light vector by -1?
+		// TODO: if the number of rays is only 1, then we should check from the center.
+		// not from the start of the axis
+		return 0;
 	}
 	
 	public Material getMaterialForSurface(Surface surface)
