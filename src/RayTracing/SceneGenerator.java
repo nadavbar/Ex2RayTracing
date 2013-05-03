@@ -35,7 +35,7 @@ public class SceneGenerator
 		double density = _camera.getScreenWidth() / _width;
 		double height = _height * (_camera.getScreenWidth() / _width);
 		System.out.println("initial: " + initial.toString());
-		Vector3D p0 = initial.sub(_camera.getVx().multByScalar(width/2)).sub(_camera.getVy().multByScalar(-height/2));
+		Vector3D p0 = initial.sub(_camera.getVx().multByScalar(width/2)).sub(_camera.getVy().multByScalar(height/2));
 		System.out.println("p0: " + p0.toString());
 		
 		for (int i=0; i<_height; i++)
@@ -49,7 +49,7 @@ public class SceneGenerator
 				imageData[i][j] = color;
 				p = p.add(_camera.getVx().multByScalar(density));
 			}
-			p0 = p0.sub(_camera.getVy().multByScalar(density));
+			p0 = p0.add(_camera.getVy().multByScalar(density));
 		}
 		
 		return imageData;

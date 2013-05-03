@@ -30,7 +30,7 @@ public class Camera
 		_normal = _lookAt.sub(_position).normalize();
 		_vz = _normal.normalize();
 		System.out.println("vz: " + _vz.toString());
-		_vx = _vz.crossProduct(_upVector);
+		_vx = _upVector.crossProduct(_vz);
 		System.out.println("vx: " + _vx.toString());
 		_vy = _vx.crossProduct(_vz);
 		System.out.println("vy: " + _vy.toString());
