@@ -150,8 +150,8 @@ public class RayTracer {
 				}
 				else if (code.equals("lgt"))
 				{
-					Light lgt = new Light(colorFromParams(params, 0), 
-							vectorFromParams(params, 3),
+					Light lgt = new Light(vectorFromParams(params, 0), 
+							colorFromParams(params, 3),
 							parseDouble(params[6]),
 							parseDouble(params[7]),
 							parseDouble(params[8]));

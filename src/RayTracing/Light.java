@@ -8,7 +8,7 @@ public class Light
 	private double _shadow;
 	private double _lightRadius;
 	
-	public Light(Color color, Vector3D position, double specular, double shadow,
+	public Light(Vector3D position, Color color, double specular, double shadow,
 				 double lightRadius)
 	{
 		_color = color;

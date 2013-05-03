@@ -13,7 +13,7 @@ public class Intersection
 	{
 		_t = t;
 		_intersectionPoint = intersectionPoint;
-		_normalAtIntersectionPoint = normal;
+		_normalAtIntersectionPoint = normal.normalize();
 		_surface = surface;
 		_ray = ray;
 	}

@@ -37,7 +37,8 @@ public class SceneGenerator
 		System.out.println("initial: " + initial.toString());
 		Vector3D p0 = initial.sub(_camera.getVx().multByScalar(width/2)).sub(_camera.getVy().multByScalar(height/2));
 		System.out.println("p0: " + p0.toString());
-		
+		Vector3D xStep = _camera.getVx().multByScalar(density);
+		Vector3D yStep = _camera.getVy().multByScalar(density);
 		for (int i=0; i<_height; i++)
 		{
 			Vector3D p = p0;
@@ -47,9 +48,9 @@ public class SceneGenerator
 				ArrayList<Intersection> intersections = getIntersectionsSorted(ray);
 				Color color = getColor(intersections);
 				imageData[i][j] = color;
-				p = p.add(_camera.getVx().multByScalar(density));
+				p = p.add(xStep);
 			}
-			p0 = p0.add(_camera.getVy().multByScalar(density));
+			p0 = p0.add(yStep);
 		}
 		
 		return imageData;
@@ -73,7 +74,7 @@ public class SceneGenerator
 	}
 	
 	// Assume the intersections are sorted
-	public Color getColor(ArrayList<Intersection> intersections)
+	private Color getColor(ArrayList<Intersection> intersections)
 	{
 		if (intersections.size() == 0)
 		{
@@ -81,10 +82,49 @@ public class SceneGenerator
 		}
 		
 		Intersection first = intersections.get(0);
-		Material material = getMaterialForSurface(first.getSurface());
+		
+		Color color = new Color(0d, 0d, 0d);
+		
+		if (first.getSurface().getClass() == Sphere.class)
+		{
+			int a = 10;
+		}
+		
+		for (Light lgt : _lights)
+		{
+			Color diffuse = getColorFromLight(first, lgt);
+			color.add(diffuse);
+		}
 		
 		// TODO: handle transperancy, lighting
-		return material.getDiffuse();
+		return color;
+	}
+	
+	private Color getColorFromLight(Intersection intersection, Light light)
+	{
+		Vector3D normal = intersection.getNormal();
+		// TODO: check if the ray is hidden from another object! use P0 as the position + epsilon
+		// Should we also do hard shadows? or only soft shadows?
+		Vector3D l = light.getPosition().sub(intersection.getIntersectionPoint()).normalize();
+		double cosTheta = normal.scalarProduct(l);
+		
+		Material material = getMaterialForSurface(intersection.getSurface());
+		
+		// Calculate diffuse:
+		double ired = material.getDiffuse().getRed() * light.getColor().getRed() * cosTheta;
+		double igreen = material.getDiffuse().getGreen() * light.getColor().getGreen() * cosTheta;
+		double iblue = material.getDiffuse().getBlue() * light.getColor().getBlue() * cosTheta;
+		
+		// calculate specular:
+		Vector3D v = _camera.getPosition().sub(intersection.getIntersectionPoint()).normalize();
+		Vector3D h = l.add(v).normalize();
+		double cosPhiPowered = Math.pow(h.scalarProduct(normal),material.getPhongCoeff());
+		
+		ired += material.getSpecular().getRed() * light.getSpecular() * cosPhiPowered;
+		igreen += material.getSpecular().getGreen() * light.getSpecular() * cosPhiPowered;
+		iblue += material.getSpecular().getBlue() * light.getSpecular() * cosPhiPowered;
+		
+		return new Color(ired, igreen, iblue);
 	}
 	
 	public Material getMaterialForSurface(Surface surface)
