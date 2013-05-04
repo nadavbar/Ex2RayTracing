@@ -127,12 +127,31 @@ public class SceneGenerator
 			igreen += material.getSpecular().getGreen() * light.getSpecular() * cosPhiPowered;
 			iblue += material.getSpecular().getBlue() * light.getSpecular() * cosPhiPowered;
 		}
+		
+		// shadows:
+		double shadow = calculateSoftShadow(l, intersection, light);
+		ired *= shadow;
+		igreen *= shadow;
+		iblue *= shadow;
+		
 		return new Color(ired, igreen, iblue);
 	}
 	
 	public double calculateSoftShadow(Vector3D lightVector, Intersection intersection, Light lgt)
 	{
-		ViewPlane lightPlane = new ViewPlane(lightVector, _camera.getUpVector());
+		// if n=1, treat this as hard shadows
+		if (_settings.getShadowRays() == 1)
+		{
+			return 1.0 -
+					(lgt.getShadow() * 
+					(1.0 - rayHits(lgt.getPosition(), intersection.getIntersectionPoint(), intersection.getSurface())));
+		}
+		else 
+		{
+			return 1.0;
+		}
+		
+		/*ViewPlane lightPlane = new ViewPlane(lightVector, _camera.getUpVector());
 		Vector3D vx = lightPlane.getVx();
 		Vector3D vy = lightPlane.getVy();
 		
@@ -142,7 +161,22 @@ public class SceneGenerator
 		// TODO: should we multiply the light vector by -1?
 		// TODO: if the number of rays is only 1, then we should check from the center.
 		// not from the start of the axis
-		return 0;
+		return 0;*/
+	}
+	
+	private double rayHits(Vector3D origin, Vector3D point, Surface surface)
+	{
+		Ray ray = new Ray(origin, point);
+		
+		ArrayList<Intersection> intersections = getIntersectionsSorted(ray);
+		
+		// This shouldn't happen, since we shoot a ray to the ball..
+		if (intersections.get(0).getSurface() == surface)
+		{
+			return 1.0;
+		}
+		
+		return 0.0;
 	}
 	
 	public Material getMaterialForSurface(Surface surface)
