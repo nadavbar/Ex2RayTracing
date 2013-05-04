@@ -142,7 +142,7 @@ public class RayTracer {
 				}
 				else if (code.equals("pln"))
 				{
-					Plain pln = new Plain(vectorFromParams(params, 0), 
+					Plane pln = new Plane(vectorFromParams(params, 0), 
 							parseDouble(params[3]),
 							Integer.parseInt(params[4]));
 					surfaces.add(pln);

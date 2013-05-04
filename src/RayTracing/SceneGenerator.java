@@ -6,6 +6,7 @@ import java.util.Comparator;
 
 public class SceneGenerator 
 {
+	private static final double EPSILON = 0.000000001;
 	private int _height;
 	private int _width;
 	private Camera _camera;
@@ -96,11 +97,16 @@ public class SceneGenerator
 	
 	private Color getColorFromLight(Intersection intersection, Light light)
 	{
-		Vector3D normal = intersection.getNormal();
+		Vector3D normal = intersection.getNormal().normalize();
 		// TODO: check if the ray is hidden from another object! use P0 as the position + epsilon
 		// Should we also do hard shadows? or only soft shadows?
 		Vector3D l = light.getPosition().sub(intersection.getIntersectionPoint()).normalize();
-		double cosTheta = normal.scalarProduct(l);
+		double cosTheta = normal.dotProduct(l);
+		
+		if (cosTheta < EPSILON)
+		{
+			return new Color(0,0,0);
+		}
 		
 		Material material = getMaterialForSurface(intersection.getSurface());
 		
@@ -110,21 +116,29 @@ public class SceneGenerator
 		double iblue = material.getDiffuse().getBlue() * light.getColor().getBlue() * cosTheta;
 		
 		// calculate specular:
-		Vector3D v = _camera.getPosition().sub(intersection.getIntersectionPoint()).normalize();
-		Vector3D h = l.add(v).normalize();
-		double cosPhiPowered = Math.pow(h.scalarProduct(normal),material.getPhongCoeff());
+		Vector3D v = intersection.getRay().getV().multByScalar(-1);
+		Vector3D r = (normal.multByScalar (2 * l.dotProduct(normal)).sub(l)).normalize();
+		double cosPhi = r.dotProduct(v);
 		
-		ired += material.getSpecular().getRed() * light.getSpecular() * cosPhiPowered;
-		igreen += material.getSpecular().getGreen() * light.getSpecular() * cosPhiPowered;
-		iblue += material.getSpecular().getBlue() * light.getSpecular() * cosPhiPowered;
-		
-		// TODO: get shadows:
-		
+		if (cosPhi > EPSILON) 
+		{
+			double cosPhiPowered = Math.pow(cosPhi,material.getPhongCoeff());
+			ired += material.getSpecular().getRed() * light.getSpecular() * cosPhiPowered;
+			igreen += material.getSpecular().getGreen() * light.getSpecular() * cosPhiPowered;
+			iblue += material.getSpecular().getBlue() * light.getSpecular() * cosPhiPowered;
+		}
 		return new Color(ired, igreen, iblue);
 	}
 	
 	public double calculateSoftShadow(Vector3D lightVector, Intersection intersection, Light lgt)
 	{
+		ViewPlane lightPlane = new ViewPlane(lightVector, _camera.getUpVector());
+		Vector3D vx = lightPlane.getVx();
+		Vector3D vy = lightPlane.getVy();
+		
+		// find the start point:
+		lgt.getLightRadius();
+		
 		// TODO: should we multiply the light vector by -1?
 		// TODO: if the number of rays is only 1, then we should check from the center.
 		// not from the start of the axis

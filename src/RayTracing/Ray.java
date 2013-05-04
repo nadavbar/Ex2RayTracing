@@ -11,6 +11,13 @@ public class Ray
 		setP0(p0);
 		setP(p);
 	}
+	
+	public Ray(Vector3D p0, Vector3D p, double epsilon)
+	{
+		setP0(p0);
+		setP(p);
+		p0 = p0.add(_v.multByScalar(epsilon));
+	}
 
 	/**
 	 * @return the p0

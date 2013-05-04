@@ -28,12 +28,12 @@ public class Sphere extends Surface
 	public Intersection checkIntersection(Ray ray) 
 	{
 		Vector3D L = _center.sub(ray.getP0());
-		double tca = L.scalarProduct(ray.getV());
+		double tca = L.dotProduct(ray.getV());
 		
 		if (tca < 0)
 			return null;
 		
-		double dsquared = L.scalarProduct(L) - tca * tca;
+		double dsquared = L.dotProduct(L) - tca * tca;
 		
 		if (dsquared > _radiusSquared)
 			return null;

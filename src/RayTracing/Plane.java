@@ -1,11 +1,11 @@
 package RayTracing;
 
-public class Plain extends Surface
+public class Plane extends Surface
 {
 	private Vector3D _normal;
 	private double _offset;
 	
-	public Plain(Vector3D normal, double offset, int materialIndex)
+	public Plane(Vector3D normal, double offset, int materialIndex)
 	{
 		super(materialIndex);
 		_normal = normal;
@@ -25,8 +25,8 @@ public class Plain extends Surface
 	@Override
 	public Intersection checkIntersection(Ray ray) 
 	{
-		double t = (ray.getP().scalarProduct(_normal) + _offset) / 
-					(ray.getV().scalarProduct(_normal));
+		double t = (ray.getP().dotProduct(_normal) + _offset) / 
+					(ray.getV().dotProduct(_normal));
 		
 		if (t < EPSILON)
 		{

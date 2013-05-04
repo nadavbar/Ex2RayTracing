@@ -23,7 +23,7 @@ public class Vector3D
 		return new Vector3D(_x - second._x, _y - second._y, _z - second._z);
 	}
 	
-	public double scalarProduct(Vector3D other)
+	public double dotProduct(Vector3D other)
 	{
 		return _x * other._x + _y * other._y + other._z * _z;
 	}
@@ -49,7 +49,7 @@ public class Vector3D
 	
 	public double size()
 	{
-		double sizeSquared = scalarProduct(this);
+		double sizeSquared = dotProduct(this);
 		return Math.sqrt(sizeSquared);
 	}
 	
