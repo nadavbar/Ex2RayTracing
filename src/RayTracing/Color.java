@@ -9,6 +9,13 @@ public class Color
 		_blue = normalize(blue);
 	}
 	
+	public Color(Color other)
+	{
+		_red = other._red;
+		_blue = other._blue;
+		_green = other._green;		
+	}
+	
 	public double getRed()
 	{
 		return _red;
