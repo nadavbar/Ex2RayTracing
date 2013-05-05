@@ -3,6 +3,7 @@ package RayTracing;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Random;
 
 public class SceneGenerator 
 {
@@ -14,6 +15,8 @@ public class SceneGenerator
 	private ArrayList<Material> _materials;
 	private ArrayList<Surface> _surfaces;
 	private ArrayList<Light> _lights;
+	private double _density;
+	private Random _random;
 	
 	public SceneGenerator(Camera camera, Settings settings, ArrayList<Material> materials, ArrayList<Surface> surfaces,
 						  ArrayList<Light> lights, int width, int height)
@@ -25,6 +28,8 @@ public class SceneGenerator
 		_materials = materials;
 		_surfaces = surfaces;
 		_lights = lights;
+		_density = _camera.getScreenWidth() / _width;
+		_random = new Random();
 	}
 	
 	public Color[][] renderScene()
@@ -34,11 +39,10 @@ public class SceneGenerator
 		ViewPlane cameraViewPlane = new ViewPlane(_camera.getNormal(), _camera.getUpVector());
 		Vector3D initial = _camera.getPosition().add(cameraViewPlane.getVz().multByScalar(_camera.getScreenDistance()));
 		double width = _camera.getScreenWidth();
-		double density = _camera.getScreenWidth() / _width;
-		double height = _height * (_camera.getScreenWidth() / _width);
+		double height = _height * _density;
 		Vector3D p0 = initial.sub(cameraViewPlane.getVx().multByScalar(width/2)).sub(cameraViewPlane.getVy().multByScalar(height/2));
-		Vector3D xStep = cameraViewPlane.getVx().multByScalar(density);
-		Vector3D yStep = cameraViewPlane.getVy().multByScalar(density);
+		Vector3D xStep = cameraViewPlane.getVx().multByScalar(_density);
+		Vector3D yStep = cameraViewPlane.getVy().multByScalar(_density);
 		for (int i=0; i<_height; i++)
 		{
 			Vector3D p = p0;
@@ -88,9 +92,9 @@ public class SceneGenerator
 		
 		for (Light lgt : _lights)
 		{
-			Color diffuse = getColorFromLight(first, lgt);
-			diffuse.multipy(1 - material.getTransperancy());
-			color.add(diffuse);
+			Color lgtColor = getColorFromLight(first, lgt);
+			lgtColor.multipy(1 - material.getTransperancy());
+			color.add(lgtColor);
 		}
 		
 		ArrayList<Intersection> nextIntersections = new ArrayList<Intersection>(intersections);
@@ -176,14 +180,32 @@ public class SceneGenerator
 		{
 			return 1.0;
 		}
-		
-		/*ViewPlane lightPlane = new ViewPlane(lightVector, _camera.getUpVector());
+		/*
+		ViewPlane lightPlane = new ViewPlane(lightVector, _camera.getUpVector());
 		Vector3D vx = lightPlane.getVx();
 		Vector3D vy = lightPlane.getVy();
 		
-		// find the start point:
-		lgt.getLightRadius();
+		Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius()/2)).sub(vy.multByScalar(lgt.getLightRadius()));
 		
+		// TODO: multiply in density?
+		double stepSize = (lgt.getLightRadius() / _settings.getShadowRays()) * _density;
+		Vector3D xStep = vx.multByScalar(stepSize);
+		Vector3D yStep = vy.multByScalar(stepSize);
+		Vector3D yPosition = startPoint;
+		for (int i=0; i< _settings.getShadowRays(); i++)
+		{
+			Vector3D xPosition = yPosition;
+			for (int j=0; j< _settings.getShadowRays(); j++)
+			{
+				double xRand = _random.nextDouble();
+				double yRand = _random.nextDouble();
+				
+				Vector3D point = xPosition.add(xPosition.multByScalar(xRand)).add(yPosition.multByScalar(yRand));
+				
+				// TODO: check if the light hits the object from this point 
+			}
+			yPosition = yPosition.add(yStep);
+		}
 		// TODO: should we multiply the light vector by -1?
 		// TODO: if the number of rays is only 1, then we should check from the center.
 		// not from the start of the axis
