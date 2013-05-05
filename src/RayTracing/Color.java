@@ -31,10 +31,22 @@ public class Color
 		_green = normalize(_green + other._green);
 	}
 	
+	public void multipy(Color other)
+	{
+		_red = normalize(_red * other._red);
+		_blue = normalize(_blue * other._blue);
+		_green = normalize(_green * other._green);		
+	}
+	
 	private double normalize(double value)
 	{
 		return Math.max(0d, Math.min(1.0, value));
 	}
+	
+	public String toString()
+	{
+		return String.format("(%.2f,%.2f,%.2f)", _red,_blue,_green); 
+	} 
 	
 	private double _red;
 	private double _green;

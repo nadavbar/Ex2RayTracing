@@ -46,7 +46,7 @@ public class SceneGenerator
 			{
 				Ray ray = new Ray(_camera.getPosition(), p);
 				ArrayList<Intersection> intersections = getIntersectionsSorted(ray);
-				Color color = getColor(intersections);
+				Color color = getColor(intersections, 0);
 				imageData[i][j] = color;
 				p = p.add(xStep);
 			}
@@ -74,7 +74,7 @@ public class SceneGenerator
 	}
 	
 	// Assume the intersections are sorted
-	private Color getColor(ArrayList<Intersection> intersections)
+	private Color getColor(ArrayList<Intersection> intersections, int generation)
 	{
 		if (intersections.size() == 0)
 		{
@@ -89,6 +89,31 @@ public class SceneGenerator
 		{
 			Color diffuse = getColorFromLight(first, lgt);
 			color.add(diffuse);
+		}
+		
+		//reflection handling
+		if (generation < 1)
+		{
+			//R = V-2(V dotproduct N)N
+			Vector3D V= first.getRay().getV();
+			Vector3D N = first.getNormal();
+			Vector3D reflectionAngle = V.sub(N.multByScalar(2*(V.dotProduct(N))));
+			
+			Ray reflectionRay = new Ray(first.getIntersectionPoint(), first.getIntersectionPoint(), reflectionAngle);
+			ArrayList<Intersection> reflectionIntersections = getIntersectionsSorted(reflectionRay);
+			//TODO reflection color!!
+			Material material = getMaterialForSurface(first.getSurface());
+			Color reflectionColor = material.getReflection();
+			//hack
+			if (first.getSurface().getMaterialIndex() == 4)
+			{
+				reflectionColor = new Color(0.9, 0.9, 0.9);
+			}
+			//System.out.println()
+			//System.out.println("material reflection color" + reflectionColor.toString() + first.getSurface().getMaterialIndex());
+			reflectionColor.multipy(getColor(reflectionIntersections, ++generation));
+			color.add(reflectionColor);
+					
 		}
 		
 		// TODO: handle transperancy, lighting
