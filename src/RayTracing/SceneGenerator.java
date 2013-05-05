@@ -82,14 +82,22 @@ public class SceneGenerator
 		}
 		
 		Intersection first = intersections.get(0);
+		Material material = getMaterialForSurface(first.getSurface());
 		
 		Color color = new Color(0d, 0d, 0d);
 		
 		for (Light lgt : _lights)
 		{
 			Color diffuse = getColorFromLight(first, lgt);
+			diffuse.multipy(1 - material.getTransperancy());
 			color.add(diffuse);
 		}
+		
+		ArrayList<Intersection> nextIntersections = new ArrayList<Intersection>(intersections);
+		nextIntersections.remove(0);
+		Color transparancyColor = new Color(getColor(nextIntersections, generation));
+		transparancyColor.multipy(material.getTransperancy());
+		color.add(transparancyColor);
 		
 		//reflection handling
 		if (generation < _settings.getRecursionLevel())
@@ -98,10 +106,9 @@ public class SceneGenerator
 			Vector3D V= first.getRay().getV();
 			Vector3D N = first.getNormal();
 			Vector3D reflectionAngle = V.sub(N.multByScalar(2*(V.dotProduct(N))));
-			
 			Ray reflectionRay = new Ray(first.getIntersectionPoint(), first.getIntersectionPoint(), reflectionAngle);
 			ArrayList<Intersection> reflectionIntersections = getIntersectionsSorted(reflectionRay);
-			Material material = getMaterialForSurface(first.getSurface());
+			
 			Color reflectionColor = getColor(reflectionIntersections, ++generation);
 			//it's better that this recursion level has its own copy of the object:
 			reflectionColor = new Color(reflectionColor);  			

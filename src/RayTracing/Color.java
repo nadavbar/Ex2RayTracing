@@ -45,6 +45,13 @@ public class Color
 		_green = normalize(_green * other._green);		
 	}
 	
+	public void multipy(double coefficient)
+	{
+		_red = normalize(_red * coefficient);
+		_blue = normalize(_blue * coefficient);
+		_green = normalize(_green * coefficient);		
+	}
+	
 	private double normalize(double value)
 	{
 		return Math.max(0d, Math.min(1.0, value));
