@@ -24,8 +24,8 @@ public class Plane extends Surface
 
 	@Override
 	public Intersection checkIntersection(Ray ray) 
-	{
-		double t = (ray.getP().dotProduct(_normal) + _offset) / 
+	{	
+		double t = (-ray.getP0().dotProduct(_normal) + _offset) / 
 					(ray.getV().dotProduct(_normal));
 		
 		if (t < EPSILON)

@@ -13,7 +13,7 @@ public class Ray
 	}
 	
 	public Ray(Vector3D p0, Vector3D p, Vector3D v) 
-	{//I need a constructor which uses v!!This is not the best solution...
+	{
 		_p0 = p0;
 		_p = p;
 		_v = v;		
