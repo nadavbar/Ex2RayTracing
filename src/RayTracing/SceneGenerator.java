@@ -93,17 +93,17 @@ public class SceneGenerator
 		for (Light lgt : _lights)
 		{
 			Color lgtColor = getColorFromLight(first, lgt);
-			lgtColor.multipy(1 - material.getTransperancy());
-			color.add(lgtColor);
+			lgtColor = lgtColor.multipy(1 - material.getTransperancy());
+			color = color.add(lgtColor);
 		}
 		
 		//add color from transparency
-		color.add(getTransparencyColor(intersections, generation, material));
+		color = color.add(getTransparencyColor(intersections, generation, material));
 		
 		//add color from reflections
 		if (generation < _settings.getRecursionLevel())
 		{
-			color.add(getReflectionsColor(first, generation, material));
+			color = color.add(getReflectionsColor(first, generation, material));
 		}
 		
 		return color;
@@ -214,10 +214,19 @@ public class SceneGenerator
 	private Color getTransparencyColor(ArrayList<Intersection> intersections, int generation, Material material)
 	{
 		ArrayList<Intersection> nextIntersections = new ArrayList<Intersection>(intersections);
-		nextIntersections.remove(0);
-		Color transparancyColor = new Color(getColor(nextIntersections, generation));
-		transparancyColor.multipy(material.getTransperancy());
-		return transparancyColor;
+		Intersection currentIntersection = nextIntersections.remove(0);
+		Color transparencyColor = new Color(getColor(nextIntersections, generation));
+		transparencyColor = transparencyColor.multipy(material.getTransperancy());
+		
+		//bonus feature
+		//new_transparency = (1 - MI) * transparency + MI * IV * transparency
+		double materialIncidence = material.getIncidence();
+		double incidenceValue = -1 * currentIntersection.getRay().getV().dotProduct(currentIntersection.getNormal());
+		
+		Color newTransparency = transparencyColor.multipy(1-materialIncidence).add(transparencyColor.multipy(materialIncidence * incidenceValue));
+		
+		return newTransparency;
+		
 	}
 	
 	private Color getReflectionsColor(Intersection intersection, int generation, Material material)
@@ -229,12 +238,18 @@ public class SceneGenerator
 		Ray reflectionRay = new Ray(intersection.getIntersectionPoint(), intersection.getIntersectionPoint(), reflectionAngle);
 		ArrayList<Intersection> reflectionIntersections = getIntersectionsSorted(reflectionRay);
 		
-		Color reflectionColor = getColor(reflectionIntersections, ++generation);
-		//it's better that this recursion level has its own copy of the object:
-		reflectionColor = new Color(reflectionColor);  			
-		reflectionColor.multipy(material.getReflection());
+		//it's better that this recursion level has its own copy of the object
+		Color reflectionColor = new Color(getColor(reflectionIntersections, ++generation));							
+		reflectionColor = reflectionColor.multipy(material.getReflection());
 		
-		return reflectionColor;
+		//bonus feature
+		//new_reflection = (1 - MI) * reflection_color + MI * (1 - IV) * reflecion_color
+		double materialIncidence = material.getIncidence();
+		double incidenceValue = -1 *intersection.getRay().getV().dotProduct(intersection.getNormal());
+		
+		Color newReflection = reflectionColor.multipy(1-materialIncidence).add(reflectionColor.multipy(materialIncidence*(1 - incidenceValue)));
+		
+		return newReflection;
 	}
 		
 	public Material getMaterialForSurface(Surface surface)

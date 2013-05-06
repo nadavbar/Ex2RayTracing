@@ -31,25 +31,19 @@ public class Color
 		return _blue;
 	}
 	
-	public void add(Color other)
+	public Color add(Color other)
 	{
-		_red = normalize(_red + other._red);
-		_blue = normalize(_blue + other._blue);
-		_green = normalize(_green + other._green);
+		return new Color(normalize(_red + other._red), normalize(_blue + other._blue), normalize(_green + other._green));
 	}
 	
-	public void multipy(Color other)
+	public Color multipy(Color other)
 	{
-		_red = normalize(_red * other._red);
-		_blue = normalize(_blue * other._blue);
-		_green = normalize(_green * other._green);		
+		return new Color(normalize(_red * other._red), normalize(_blue * other._blue), normalize(_green * other._green));		
 	}
 	
-	public void multipy(double coefficient)
+	public Color multipy(double coefficient)
 	{
-		_red = normalize(_red * coefficient);
-		_blue = normalize(_blue * coefficient);
-		_green = normalize(_green * coefficient);		
+		return new Color(normalize(_red * coefficient), normalize(_blue * coefficient), normalize(_green * coefficient));		
 	}
 	
 	private double normalize(double value)
