@@ -245,7 +245,7 @@ public class SceneGenerator
 		//bonus feature
 		//new_reflection = (1 - MI) * reflection_color + MI * (1 - IV) * reflecion_color
 		double materialIncidence = material.getIncidence();
-		double incidenceValue = -1 *intersection.getRay().getV().dotProduct(intersection.getNormal());
+		double incidenceValue = -1 * intersection.getRay().getV().dotProduct(intersection.getNormal());
 		
 		Color newReflection = reflectionColor.multipy(1-materialIncidence).add(reflectionColor.multipy(materialIncidence*(1 - incidenceValue)));
 		
