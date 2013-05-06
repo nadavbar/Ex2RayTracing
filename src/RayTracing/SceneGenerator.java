@@ -97,31 +97,15 @@ public class SceneGenerator
 			color.add(lgtColor);
 		}
 		
-		ArrayList<Intersection> nextIntersections = new ArrayList<Intersection>(intersections);
-		nextIntersections.remove(0);
-		Color transparancyColor = new Color(getColor(nextIntersections, generation));
-		transparancyColor.multipy(material.getTransperancy());
-		color.add(transparancyColor);
+		//add color from transparency
+		color.add(getTransparencyColor(intersections, generation, material));
 		
-		//reflection handling
+		//add color from reflections
 		if (generation < _settings.getRecursionLevel())
 		{
-			//R = V-2(V dotproduct N)N
-			Vector3D V= first.getRay().getV();
-			Vector3D N = first.getNormal();
-			Vector3D reflectionAngle = V.sub(N.multByScalar(2*(V.dotProduct(N))));
-			Ray reflectionRay = new Ray(first.getIntersectionPoint(), first.getIntersectionPoint(), reflectionAngle);
-			ArrayList<Intersection> reflectionIntersections = getIntersectionsSorted(reflectionRay);
-			
-			Color reflectionColor = getColor(reflectionIntersections, ++generation);
-			//it's better that this recursion level has its own copy of the object:
-			reflectionColor = new Color(reflectionColor);  			
-			reflectionColor.multipy(material.getReflection());
-			color.add(reflectionColor);
-					
+			color.add(getReflectionsColor(first, generation, material));
 		}
 		
-		// TODO: handle transperancy, lighting
 		return color;
 	}
 	
@@ -227,6 +211,32 @@ public class SceneGenerator
 		return 0.0;
 	}
 	
+	private Color getTransparencyColor(ArrayList<Intersection> intersections, int generation, Material material)
+	{
+		ArrayList<Intersection> nextIntersections = new ArrayList<Intersection>(intersections);
+		nextIntersections.remove(0);
+		Color transparancyColor = new Color(getColor(nextIntersections, generation));
+		transparancyColor.multipy(material.getTransperancy());
+		return transparancyColor;
+	}
+	
+	private Color getReflectionsColor(Intersection intersection, int generation, Material material)
+	{
+		//R = V-2(V dotproduct N)N
+		Vector3D V= intersection.getRay().getV();
+		Vector3D N = intersection.getNormal();
+		Vector3D reflectionAngle = V.sub(N.multByScalar(2*(V.dotProduct(N))));
+		Ray reflectionRay = new Ray(intersection.getIntersectionPoint(), intersection.getIntersectionPoint(), reflectionAngle);
+		ArrayList<Intersection> reflectionIntersections = getIntersectionsSorted(reflectionRay);
+		
+		Color reflectionColor = getColor(reflectionIntersections, ++generation);
+		//it's better that this recursion level has its own copy of the object:
+		reflectionColor = new Color(reflectionColor);  			
+		reflectionColor.multipy(material.getReflection());
+		
+		return reflectionColor;
+	}
+		
 	public Material getMaterialForSurface(Surface surface)
 	{
 		// we assume that everything is valid and the material exists
