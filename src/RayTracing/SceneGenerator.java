@@ -18,6 +18,7 @@ public class SceneGenerator
 	private double _density;
 	private Random _random;
 	private double _numberOfShadowRays;
+	private double [][][] _randArray;
 	
 	public SceneGenerator(Camera camera, Settings settings, ArrayList<Material> materials, ArrayList<Surface> surfaces,
 						  ArrayList<Light> lights, int width, int height)
@@ -32,6 +33,15 @@ public class SceneGenerator
 		_density = _camera.getScreenWidth() / _width;
 		_random = new Random();
 		_numberOfShadowRays = _settings.getShadowRays()*_settings.getShadowRays();
+		_randArray = new double[_settings.getShadowRays()][_settings.getShadowRays()][2];
+		for (int i=0; i < _settings.getShadowRays(); i++)
+		{
+			for (int j=0; j < _settings.getShadowRays(); j++)
+			{
+				_randArray[i][j][0] = _random.nextDouble();
+				_randArray[i][j][1] = _random.nextDouble();
+			}
+		}
 	}
 	
 	public Color[][] renderScene()
@@ -175,13 +185,18 @@ public class SceneGenerator
 		Vector3D yStep = vy.multByScalar(stepSize);
 		Vector3D yPosition = startPoint;
 		double numberOfHits = 0d;
+		
 		for (int i=0; i< _settings.getShadowRays(); i++)
 		{
 			Vector3D xPosition = yPosition;
 			for (int j=0; j< _settings.getShadowRays(); j++)
 			{
-				double xRand = _random.nextDouble();
-				double yRand = _random.nextDouble();
+				//double xRand = _random.nextDouble();
+				//double yRand = _random.nextDouble();
+				//double xRand = 1.0;
+				//double yRand = 1.0;
+				double yRand = _randArray[i][j][0];
+				double xRand = _randArray[i][j][1];
 				
 				Vector3D point = xPosition.add(xStep.multByScalar(xRand)).add(yStep.multByScalar(yRand));
 				
@@ -221,7 +236,8 @@ public class SceneGenerator
 		}
 		else
 		{
-			return 0.0;
+			Material material = getMaterialForSurface(first.getSurface());
+			return material.getTransperancy();
 		}
 	}
 	
