@@ -36,12 +36,12 @@ public class Color
 		return new Color(normalize(_red + other._red), normalize(_blue + other._blue), normalize(_green + other._green));
 	}
 	
-	public Color multipy(Color other)
+	public Color multiply(Color other)
 	{
 		return new Color(normalize(_red * other._red), normalize(_blue * other._blue), normalize(_green * other._green));		
 	}
 	
-	public Color multipy(double coefficient)
+	public Color multiply(double coefficient)
 	{
 		return new Color(normalize(_red * coefficient), normalize(_blue * coefficient), normalize(_green * coefficient));		
 	}

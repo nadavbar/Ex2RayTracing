@@ -105,7 +105,7 @@ public class SceneGenerator
 		for (Light lgt : _lights)
 		{
 			Color lgtColor = getColorFromLight(first, lgt);
-			lgtColor = lgtColor.multipy(1 - material.getTransperancy());
+			lgtColor = lgtColor.multiply(1 - material.getTransperancy());
 			
 			color = color.add(lgtColor);
 		}
@@ -178,10 +178,11 @@ public class SceneGenerator
 		Vector3D vx = lightPlane.getVx();
 		Vector3D vy = lightPlane.getVy();
 		
-		Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius()/2)).sub(vy.multByScalar(lgt.getLightRadius()/2));
-		
+		//Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius())).sub(vy.multByScalar(lgt.getLightRadius()));
+		Vector3D startPoint = lgt.getPosition().add(vx.multByScalar(lgt.getLightRadius())).add(vy.multByScalar(lgt.getLightRadius()));
+		//Vector3D startPoint = lgt.getPosition();
 		// TODO: multiply in density?
-		double stepSize = (lgt.getLightRadius() / _settings.getShadowRays());
+		double stepSize = 2*(lgt.getLightRadius() / _settings.getShadowRays());
 		Vector3D xStep = vx.multByScalar(stepSize);
 		Vector3D yStep = vy.multByScalar(stepSize);
 		Vector3D yPosition = startPoint;
@@ -192,12 +193,10 @@ public class SceneGenerator
 			Vector3D xPosition = yPosition;
 			for (int j=0; j< _settings.getShadowRays(); j++)
 			{
-				//double xRand = _random.nextDouble();
-				//double yRand = _random.nextDouble();
-				//double xRand = 1.0;
-				//double yRand = 1.0;
-				double yRand = _randArray[i][j][0];
-				double xRand = _randArray[i][j][1];
+				double xRand = _random.nextDouble();
+				double yRand = _random.nextDouble();
+				//double yRand = _randArray[i][j][0];
+				//double xRand = _randArray[i][j][1];
 				
 				Vector3D point = xPosition.add(xStep.multByScalar(xRand)).add(yStep.multByScalar(yRand));
 				
@@ -247,14 +246,14 @@ public class SceneGenerator
 		ArrayList<Intersection> nextIntersections = new ArrayList<Intersection>(intersections);
 		Intersection currentIntersection = nextIntersections.remove(0);
 		Color transparencyColor = new Color(getColor(nextIntersections, generation));
-		transparencyColor = transparencyColor.multipy(material.getTransperancy());
+		transparencyColor = transparencyColor.multiply(material.getTransperancy());
 		
 		//bonus feature
 		//new_transparency = (1 - MI) * transparency + MI * IV * transparency
 		double materialIncidence = material.getIncidence();
 		double incidenceValue = -1 * currentIntersection.getRay().getV().dotProduct(currentIntersection.getNormal());
 		
-		Color newTransparency = transparencyColor.multipy(1-materialIncidence).add(transparencyColor.multipy(materialIncidence * incidenceValue));
+		Color newTransparency = transparencyColor.multiply(1-materialIncidence).add(transparencyColor.multiply(materialIncidence * incidenceValue));
 		
 		return newTransparency;
 		
@@ -271,14 +270,14 @@ public class SceneGenerator
 		
 		//it's better that this recursion level has its own copy of the object
 		Color reflectionColor = new Color(getColor(reflectionIntersections, ++generation));							
-		reflectionColor = reflectionColor.multipy(material.getReflection());
+		reflectionColor = reflectionColor.multiply(material.getReflection());
 		
 		//bonus feature
 		//new_reflection = (1 - MI) * reflection_color + MI * (1 - IV) * reflecion_color
 		double materialIncidence = material.getIncidence();
 		double incidenceValue = -1 * intersection.getRay().getV().dotProduct(intersection.getNormal());
 		
-		Color newReflection = reflectionColor.multipy(1-materialIncidence).add(reflectionColor.multipy(materialIncidence*(1 - incidenceValue)));
+		Color newReflection = reflectionColor.multiply(1-materialIncidence).add(reflectionColor.multiply(materialIncidence*(1 - incidenceValue)));
 		
 		return newReflection;
 	}
