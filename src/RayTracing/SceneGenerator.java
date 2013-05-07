@@ -106,6 +106,7 @@ public class SceneGenerator
 		{
 			Color lgtColor = getColorFromLight(first, lgt);
 			lgtColor = lgtColor.multipy(1 - material.getTransperancy());
+			
 			color = color.add(lgtColor);
 		}
 		
@@ -149,7 +150,7 @@ public class SceneGenerator
 		if (cosPhi > EPSILON) 
 		{
 			double cosPhiPowered = Math.pow(cosPhi,material.getPhongCoeff());
-			ired += material.getSpecular().getRed() * light.getSpecular() * cosPhiPowered;
+			ired += material.getSpecular().getRed() * light.getSpecular() *  cosPhiPowered;
 			igreen += material.getSpecular().getGreen() * light.getSpecular() * cosPhiPowered;
 			iblue += material.getSpecular().getBlue() * light.getSpecular() * cosPhiPowered;
 		}

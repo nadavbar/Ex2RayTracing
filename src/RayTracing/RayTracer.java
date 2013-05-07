@@ -108,7 +108,7 @@ public class RayTracer {
 					camera = new Camera(vectorFromParams(params, 0),
 							vectorFromParams(params, 3),
 							vectorFromParams(params, 6),
-							parseDouble(params[9]), parseDouble(params[10]));
+							parseDouble(params, 9), parseDouble(params, 10));
 					//System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
 				}
 				else if (code.equals("set"))
@@ -122,18 +122,18 @@ public class RayTracer {
 					Material material = new Material(colorFromParams(params, 0),
 							colorFromParams(params, 3),
 							colorFromParams(params, 6),
-							parseDouble(params[9]),
-							parseDouble(params[10]),
-							parseDouble(params[11]));
+							parseDouble(params, 9),
+							parseDouble(params, 10),
+							parseDouble(params, 11));
 					materials.add(material);
 					//System.out.println(String.format("Parsed material (line %d)", lineNum));
 				}
 				else if (code.equals("sph"))
 				{
-					Sphere sph = new Sphere(parseDouble(params[0]),
-							parseDouble(params[1]),
-							parseDouble(params[2]),
-							parseDouble(params[3]),
+					Sphere sph = new Sphere(parseDouble(params, 0),
+							parseDouble(params, 1),
+							parseDouble(params, 2),
+							parseDouble(params, 3),
 							Integer.parseInt(params[4]));
 					
 					surfaces.add(sph);
@@ -143,7 +143,7 @@ public class RayTracer {
 				else if (code.equals("pln"))
 				{
 					Plane pln = new Plane(vectorFromParams(params, 0), 
-							parseDouble(params[3]),
+							parseDouble(params, 3),
 							Integer.parseInt(params[4]));
 					surfaces.add(pln);
 					//System.out.println(String.format("Parsed plane (line %d)", lineNum));
@@ -152,9 +152,9 @@ public class RayTracer {
 				{
 					Light lgt = new Light(vectorFromParams(params, 0), 
 							colorFromParams(params, 3),
-							parseDouble(params[6]),
-							parseDouble(params[7]),
-							parseDouble(params[8]));
+							parseDouble(params, 6),
+							parseDouble(params, 7),
+							parseDouble(params, 8));
 					lights.add(lgt);
 					//System.out.println(String.format("Parsed light (line %d)", lineNum));
 				}
@@ -178,26 +178,31 @@ public class RayTracer {
 	
 	private Color colorFromParams(String[] params, int index)
 	{
-		return new Color(parseDouble(params[index]),
-				parseDouble(params[index+1]),
-				parseDouble(params[index+2]));
+		return new Color(parseDouble(params ,index),
+				parseDouble(params, index+1),
+				parseDouble(params, index+2));
 	}
 	
 	private Vector3D vectorFromParams(String[] params, int index)
 	{
-		return new Vector3D(parseDouble(params[index]),
-				parseDouble(params[index+1]),
-				parseDouble(params[index+2]));
+		return new Vector3D(parseDouble(params, index),
+				parseDouble(params, index+1),
+				parseDouble(params, index+2));
 	}
 	
-	private double parseDouble(String param)
+	private double parseDouble(String[] param, int index)
 	{
-		if (param == null)
+		if (param.length <= index )
 		{
 			return 0;
 		}
 		
-		return Double.parseDouble(param);
+		if (param[index] == null)
+		{
+			return 0;
+		}
+		
+		return Double.parseDouble(param[index]);
 	}
 
 	/**
