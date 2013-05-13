@@ -16,7 +16,7 @@ mtl		0.8  	0.6  	0.8  	0.8  	0.5  	0.8   	0.3    	0.2    	0.3   	40    	0.5	0
 mtl		0.6  	0.6  	0.8  	0.5  	0.5  	0.8   	0.2    	0.2    	0.3   	40    	0.5	0
 
 # 6 = Opaque
-mtl		0.6	0.6	0.2	0	0	0	0.05	0.05	0.05	1	0
+mtl		0.6	0.6	0.2	0	0	0	0.05	0.05	0.05	1	0	0
 
 # The spheres are random!
 # Spheres:	cx   	   cy       cz        radius 	mat_idx
