@@ -105,7 +105,7 @@ public class SceneGenerator
 		for (Light lgt : _lights)
 		{
 			Color lgtColor = getColorFromLight(first, lgt);
-			lgtColor = lgtColor.multipy(1 - material.getTransperancy());
+			lgtColor = lgtColor.multiply(1 - material.getTransperancy());
 			
 			color = color.add(lgtColor);
 		}
@@ -248,14 +248,14 @@ public class SceneGenerator
 		ArrayList<Intersection> nextIntersections = new ArrayList<Intersection>(intersections);
 		Intersection currentIntersection = nextIntersections.remove(0);
 		Color transparencyColor = new Color(getColor(nextIntersections, generation));
-		transparencyColor = transparencyColor.multipy(material.getTransperancy());
+		transparencyColor = transparencyColor.multiply(material.getTransperancy());
 		
 		//bonus feature
 		//new_transparency = (1 - MI) * transparency + MI * IV * transparency
 		double materialIncidence = material.getIncidence();
 		double incidenceValue = -1 * currentIntersection.getRay().getV().dotProduct(currentIntersection.getNormal());
 		
-		Color newTransparency = transparencyColor.multipy(1-materialIncidence).add(transparencyColor.multipy(materialIncidence * incidenceValue));
+		Color newTransparency = transparencyColor.multiply(1-materialIncidence).add(transparencyColor.multiply(materialIncidence * incidenceValue));
 		
 		return newTransparency;
 		
@@ -272,14 +272,14 @@ public class SceneGenerator
 		
 		//it's better that this recursion level has its own copy of the object
 		Color reflectionColor = new Color(getColor(reflectionIntersections, ++generation));							
-		reflectionColor = reflectionColor.multipy(material.getReflection());
+		reflectionColor = reflectionColor.multiply(material.getReflection());
 		
 		//bonus feature
 		//new_reflection = (1 - MI) * reflection_color + MI * (1 - IV) * reflecion_color
 		double materialIncidence = material.getIncidence();
 		double incidenceValue = -1 * intersection.getRay().getV().dotProduct(intersection.getNormal());
 		
-		Color newReflection = reflectionColor.multipy(1-materialIncidence).add(reflectionColor.multipy(materialIncidence*(1 - incidenceValue)));
+		Color newReflection = reflectionColor.multiply(1-materialIncidence).add(reflectionColor.multiply(materialIncidence*(1 - incidenceValue)));
 		
 		return newReflection;
 	}
