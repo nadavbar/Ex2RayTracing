@@ -1,10 +1,21 @@
 package RayTracing;
 
+/**
+ * A Plane object
+ */
 public class Plane extends Surface
 {
+	/** The normal of the plane*/
 	private Vector3D _normal;
+	/** The offset of the plane*/
 	private double _offset;
 	
+	/**
+	 * Creates a new plane
+	 * @param normal The normal of the plane
+	 * @param offset The offset of the plane
+	 * @param materialIndex The index of the plane material
+	 */
 	public Plane(Vector3D normal, double offset, int materialIndex)
 	{
 		super(materialIndex);
@@ -12,16 +23,28 @@ public class Plane extends Surface
 		_offset = offset;
 	}
 	
+	/**
+	 * 
+	 * @return The normal of the plane 
+	 */
 	public Vector3D getNormal()
 	{
 		return _normal;
 	}
 	
+	/**
+	 * 
+	 * @return the offset of the plane
+	 */
 	public double getOffset()
 	{
 		return _offset;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see RayTracing.Surface#checkIntersection(RayTracing.Ray)
+	 */
 	@Override
 	public Intersection checkIntersection(Ray ray) 
 	{	

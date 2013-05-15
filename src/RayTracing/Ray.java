@@ -1,17 +1,34 @@
 package RayTracing;
 
+/**
+ * This class represents a ray, with a start position and a direction
+ */
 public class Ray 
 {
+	/** The initial point of the ray*/
 	private Vector3D _p0;
+	/** The target of the ray */
 	private Vector3D _p;
+	/** The direction of the ray*/
 	private Vector3D _v;
 	
+	/**
+	 * Creates a new ray
+	 * @param p0 The initial poing
+	 * @param p The target point
+	 */
 	public Ray(Vector3D p0, Vector3D p)
 	{
 		setP0(p0);
 		setP(p);
 	}
 	
+	/**
+	 * Creates a new ray (used for copying)
+	 * @param p0 The initial point
+	 * @param p The target point
+	 * @param v The direction
+	 */
 	public Ray(Vector3D p0, Vector3D p, Vector3D v) 
 	{
 		_p0 = p0;
@@ -19,6 +36,12 @@ public class Ray
 		_v = v;		
 	}
 	
+	/**
+	 * Creates a new ray
+	 * @param p0 The initial poing
+	 * @param p The target point
+	 * @param epsilon The offset in which the start position will be set
+	 */
 	public Ray(Vector3D p0, Vector3D p, double epsilon)
 	{
 		setP0(p0);
@@ -27,7 +50,7 @@ public class Ray
 	}
 
 	/**
-	 * @return the p0
+	 * @return the initial point
 	 */
 	public Vector3D getP0() 
 	{
@@ -35,7 +58,7 @@ public class Ray
 	}
 
 	/**
-	 * @param p0 the p0 to set
+	 * @param p0 the initial point to set
 	 */
 	public void setP0(Vector3D p0) 
 	{
@@ -48,20 +71,24 @@ public class Ray
 	}
 
 	/**
-	 * @return the p
+	 * @return the target of the ray
 	 */
 	public Vector3D getP() 
 	{
 		return _p;
 	}
 	
+	/**
+	 * 
+	 * @return The direction
+	 */
 	public Vector3D getV()
 	{
 		return _v;
 	}
 
 	/**
-	 * @param _p the _p to set
+	 * @param p the target to set
 	 */
 	public void setP(Vector3D p) 
 	{

@@ -17,8 +17,7 @@ public class SceneGenerator
 	private ArrayList<Light> _lights;
 	private double _density;
 	private Random _random;
-	private double _numberOfShadowRays;
-	private double [][][] _randArray;
+	private double _numberOfShadowRays;	
 	
 	public SceneGenerator(Camera camera, Settings settings, ArrayList<Material> materials, ArrayList<Surface> surfaces,
 						  ArrayList<Light> lights, int width, int height)
@@ -33,15 +32,6 @@ public class SceneGenerator
 		_density = _camera.getScreenWidth() / _width;
 		_random = new Random();
 		_numberOfShadowRays = _settings.getShadowRays()*_settings.getShadowRays();
-		_randArray = new double[_settings.getShadowRays()][_settings.getShadowRays()][2];
-		for (int i=0; i < _settings.getShadowRays(); i++)
-		{
-			for (int j=0; j < _settings.getShadowRays(); j++)
-			{
-				_randArray[i][j][0] = _random.nextDouble();
-				_randArray[i][j][1] = _random.nextDouble();
-			}
-		}
 	}
 	
 	public Color[][] renderScene()
@@ -174,15 +164,13 @@ public class SceneGenerator
 					(1.0 - rayHits(intersection.getIntersectionPoint(), lgt.getPosition(), intersection.getSurface())));
 		}
 		
-		ViewPlane lightPlane = new ViewPlane(lightVector, _camera.getUpVector());
+		ViewPlane lightPlane = new ViewPlane(lightVector.multByScalar(-1), _camera.getUpVector());
 		Vector3D vx = lightPlane.getVx();
 		Vector3D vy = lightPlane.getVy();
 		
-		//Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius())).sub(vy.multByScalar(lgt.getLightRadius()));
-		Vector3D startPoint = lgt.getPosition().add(vx.multByScalar(lgt.getLightRadius())).add(vy.multByScalar(lgt.getLightRadius()));
-		//Vector3D startPoint = lgt.getPosition();
-		// TODO: multiply in density?
-		double stepSize = 2*(lgt.getLightRadius() / _settings.getShadowRays());
+		Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius()/2)).sub(vy.multByScalar(lgt.getLightRadius()/2));
+
+		double stepSize = (lgt.getLightRadius() / _settings.getShadowRays());
 		Vector3D xStep = vx.multByScalar(stepSize);
 		Vector3D yStep = vy.multByScalar(stepSize);
 		Vector3D yPosition = startPoint;
@@ -193,12 +181,19 @@ public class SceneGenerator
 			Vector3D xPosition = yPosition;
 			for (int j=0; j< _settings.getShadowRays(); j++)
 			{
-				double xRand = _random.nextDouble();
-				double yRand = _random.nextDouble();
-				//double yRand = _randArray[i][j][0];
-				//double xRand = _randArray[i][j][1];
+				Vector3D point = null;
 				
-				Vector3D point = xPosition.add(xStep.multByScalar(xRand)).add(yStep.multByScalar(yRand));
+				if (i == _settings.getShadowRays() /2 && j == _settings.getShadowRays() / 2 )
+				{
+					point = lgt.getPosition();
+				}
+				else 
+				{
+					double xRand = _random.nextDouble();
+					double yRand = _random.nextDouble();
+					
+					point = xPosition.add(xStep.multByScalar(xRand)).add(yStep.multByScalar(yRand));
+				}
 				
 				// TODO: check if the light hits the object from this point
 				numberOfHits += rayHits(intersection.getIntersectionPoint(),point, intersection.getSurface());
@@ -207,12 +202,9 @@ public class SceneGenerator
 			yPosition = yPosition.add(yStep);
 		}
 		
-		double nonHitPrecentage = 1 - (numberOfHits / (_numberOfShadowRays));
+		double nonHitPrecentage = 1 - ((double)numberOfHits / ((double)_numberOfShadowRays));
 		
 		return 1.0 - (nonHitPrecentage * lgt.getShadow());
-		// TODO: should we multiply the light vector by -1?
-		// TODO: if the number of rays is only 1, then we should check from the center.
-		// not from the start of the axis
 	}
 	
 	private double rayHits(Vector3D origin, Vector3D point, Surface surface)
@@ -262,15 +254,24 @@ public class SceneGenerator
 	private Color getReflectionsColor(Intersection intersection, int generation, Material material)
 	{
 		//R = V-2(V dotproduct N)N
-		Vector3D V= intersection.getRay().getV();
+		Vector3D V = intersection.getRay().getV();
 		Vector3D N = intersection.getNormal();
-		Vector3D reflectionAngle = V.sub(N.multByScalar(2*(V.dotProduct(N))));
-		Ray reflectionRay = new Ray(intersection.getIntersectionPoint(), intersection.getIntersectionPoint(), reflectionAngle);
+		Vector3D R = (V.sub(N.multByScalar(2*(V.dotProduct(N))))).normalize();
+		Ray reflectionRay = new Ray(intersection.getIntersectionPoint().add(R.multByScalar(EPSILON)), intersection.getIntersectionPoint().add(R), R);
 		ArrayList<Intersection> reflectionIntersections = getIntersectionsSorted(reflectionRay);
 		
-		//it's better that this recursion level has its own copy of the object
-		Color reflectionColor = new Color(getColor(reflectionIntersections, ++generation));							
-		reflectionColor = reflectionColor.multiply(material.getReflection());
+		Color reflectionColor = null;
+		Color materialReflectionColor = material.getReflection();
+		if (materialReflectionColor.getBlue() == 0 && materialReflectionColor.getGreen() == 0
+			&& materialReflectionColor.getRed() == 0)
+		{
+			reflectionColor = new Color(0, 0, 0);
+		}
+		else
+		{
+			reflectionColor = getColor(reflectionIntersections, generation + 1);
+			reflectionColor = reflectionColor.multiply(material.getReflection());
+		}
 		
 		//bonus feature
 		//new_reflection = (1 - MI) * reflection_color + MI * (1 - IV) * reflecion_color

@@ -1,7 +1,25 @@
 package RayTracing;
 
+/**
+ * A sphere object
+ */
 public class Sphere extends Surface
 {
+	/** The center of the sphere */
+	Vector3D _center;
+	/** The radius of the sphere */
+	private double _radius;
+	/** The squared radius of the sphere. Saved here as an optimization*/
+	private double _radiusSquared;
+	
+	/**
+	 * Creates a new sphere
+	 * @param x The x coordinate of the sphere center
+	 * @param y The y coordinate of the sphere center
+	 * @param z The z coordinate of the sphere center
+	 * @param radius The radius of the sphere
+	 * @param materialIndex The material index of the surface
+	 */
 	public Sphere(double x, double y, double z, double radius, int materialIndex)
 	{
 		super(materialIndex);
@@ -10,20 +28,28 @@ public class Sphere extends Surface
 		_radiusSquared  = _radius * _radius;
 	}
 	
-	Vector3D _center;
-	private double _radius;
-	private double _radiusSquared;
-	
+	/**
+	 * 
+	 * @return The center of the sphere
+	 */
 	public Vector3D getCenter()
 	{
 		return _center;
 	}
 	
+	/**
+	 * 
+	 * @return The radius of the sphere
+	 */
 	public double getRadius()
 	{
 		return _radius;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see RayTracing.Surface#checkIntersection(RayTracing.Ray)
+	 */
 	@Override
 	public Intersection checkIntersection(Ray ray) 
 	{
@@ -62,8 +88,6 @@ public class Sphere extends Surface
 		
 		Vector3D intersectionPoint = ray.getP0().add(ray.getV().multByScalar(t));
 		Vector3D normal = intersectionPoint.sub(_center).normalize();
-		
-		// TODO: if the camera is inside the sphere?
 		
 		return new Intersection(t, intersectionPoint, normal, this, ray);
 	}

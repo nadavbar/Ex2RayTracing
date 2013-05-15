@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -109,7 +108,7 @@ public class RayTracer {
 							vectorFromParams(params, 3),
 							vectorFromParams(params, 6),
 							parseDouble(params, 9), parseDouble(params, 10));
-					//System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
+					System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
 				}
 				else if (code.equals("set"))
 				{
@@ -126,7 +125,7 @@ public class RayTracer {
 							parseDouble(params, 10),
 							parseDouble(params, 11));
 					materials.add(material);
-					//System.out.println(String.format("Parsed material (line %d)", lineNum));
+					System.out.println(String.format("Parsed material (line %d)", lineNum));
 				}
 				else if (code.equals("sph"))
 				{
@@ -138,7 +137,7 @@ public class RayTracer {
 					
 					surfaces.add(sph);
 
-					//System.out.println(String.format("Parsed sphere (line %d)", lineNum));
+					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
 				}
 				else if (code.equals("pln"))
 				{
@@ -146,7 +145,7 @@ public class RayTracer {
 							parseDouble(params, 3),
 							Integer.parseInt(params[4]));
 					surfaces.add(pln);
-					//System.out.println(String.format("Parsed plane (line %d)", lineNum));
+					System.out.println(String.format("Parsed plane (line %d)", lineNum));
 				}
 				else if (code.equals("lgt"))
 				{
@@ -156,7 +155,7 @@ public class RayTracer {
 							parseDouble(params, 7),
 							parseDouble(params, 8));
 					lights.add(lgt);
-					//System.out.println(String.format("Parsed light (line %d)", lineNum));
+					System.out.println(String.format("Parsed light (line %d)", lineNum));
 				}
 				else
 				{
@@ -164,16 +163,41 @@ public class RayTracer {
 				}
 			}
 		}
-
-                // It is recommended that you check here that the scene is valid,
-                // for example camera settings and all necessary materials were defined.
+		
+		if (!validateScene(camera, settings, materials, surfaces, lights))
+		{
+			System.out.println("Given scene isn't valid, exiting");
+		}
 		
 		// TODO: check that the scene is valid!!!!
 		_sceneGenerator = new SceneGenerator(camera, settings, materials, surfaces, lights,
 											_imageWidth, _imageHeight);
 		
+		r.close();
+		
 		System.out.println("Finished parsing scene file " + sceneFileName);
 
+	}
+	
+	private boolean validateScene(Camera camera, Settings settings, 
+								  ArrayList<Material> materials, ArrayList<Surface> surfaces,
+								  ArrayList<Light> lights)
+	{
+		if (camera == null || settings == null)
+		{
+			return false;
+		}
+		
+		for (Surface surface : surfaces)
+		{
+			if (surface.getMaterialIndex() <= 0 ||
+				surface.getMaterialIndex() > materials.size())
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	private Color colorFromParams(String[] params, int index)
@@ -288,7 +312,10 @@ public class RayTracer {
 	    return result;
 	}
 
-	public static class RayTracerException extends Exception {
+	public static class RayTracerException extends Exception 
+	{
+		private static final long serialVersionUID = -2109299985872926772L;
+
 		public RayTracerException(String msg) {  super(msg); }
 	}
 
