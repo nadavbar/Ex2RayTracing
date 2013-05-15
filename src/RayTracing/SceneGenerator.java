@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class SceneGenerator 
 {
-	private static final double EPSILON = 0.000000001;
+	private static final double EPSILON = 0.00001;
 	private int _height;
 	private int _width;
 	private Camera _camera;
@@ -135,14 +135,15 @@ public class SceneGenerator
 		// calculate specular:
 		Vector3D v = intersection.getRay().getV().multByScalar(-1);
 		Vector3D r = (normal.multByScalar (2 * l.dotProduct(normal)).sub(l)).normalize();
+		
 		double cosPhi = r.dotProduct(v);
 		
-		if (cosPhi > EPSILON) 
-		{
+		if (cosPhi > 0) 
+		{			
 			double cosPhiPowered = Math.pow(cosPhi,material.getPhongCoeff());
-			ired += material.getSpecular().getRed() * light.getSpecular() *  cosPhiPowered;
-			igreen += material.getSpecular().getGreen() * light.getSpecular() * cosPhiPowered;
-			iblue += material.getSpecular().getBlue() * light.getSpecular() * cosPhiPowered;
+			ired += material.getSpecular().getRed() * light.getSpecular() *  cosPhiPowered * light.getColor().getRed();
+			igreen += material.getSpecular().getGreen() * light.getSpecular() * cosPhiPowered * light.getColor().getGreen();
+			iblue += material.getSpecular().getBlue() * light.getSpecular() * cosPhiPowered * light.getColor().getBlue();
 		}
 		
 		// shadows:
@@ -216,7 +217,7 @@ public class SceneGenerator
 		double distanceFromOther = first.getIntersectionPoint().sub(point).size();
 		double distanceFromSurface = origin.sub(point).size();
 		
-		if (distanceFromOther > distanceFromSurface)
+		if (distanceFromOther > distanceFromSurface || Math.abs(distanceFromOther - distanceFromSurface) < EPSILON)
 		{
 			return 1.0;
 		}
