@@ -33,17 +33,17 @@ public class Color
 	
 	public Color add(Color other)
 	{
-		return new Color(normalize(_red + other._red), normalize(_blue + other._blue), normalize(_green + other._green));
+		return new Color(normalize(_red + other._red), normalize(_green + other._green), normalize(_blue + other._blue));
 	}
 	
 	public Color multiply(Color other)
 	{
-		return new Color(normalize(_red * other._red), normalize(_blue * other._blue), normalize(_green * other._green));		
+		return new Color(normalize(_red * other._red), normalize(_green * other._green), normalize(_blue * other._blue));		
 	}
 	
 	public Color multiply(double coefficient)
 	{
-		return new Color(normalize(_red * coefficient), normalize(_blue * coefficient), normalize(_green * coefficient));		
+		return new Color(normalize(_red * coefficient), normalize(_green * coefficient), normalize(_blue * coefficient));		
 	}
 	
 	private double normalize(double value)

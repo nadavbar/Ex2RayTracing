@@ -132,6 +132,8 @@ public class SceneGenerator
 		double igreen = material.getDiffuse().getGreen() * light.getColor().getGreen() * cosTheta;
 		double iblue = material.getDiffuse().getBlue() * light.getColor().getBlue() * cosTheta;
 		
+		
+		
 		// calculate specular:
 		Vector3D v = intersection.getRay().getV().multByScalar(-1);
 		Vector3D r = (normal.multByScalar (2 * l.dotProduct(normal)).sub(l)).normalize();
