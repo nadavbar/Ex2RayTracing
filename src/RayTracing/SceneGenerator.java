@@ -167,7 +167,8 @@ public class SceneGenerator
 					(1.0 - rayHits(intersection.getIntersectionPoint(), lgt.getPosition(), intersection.getSurface())));
 		}
 		
-		ViewPlane lightPlane = new ViewPlane(lightVector.multByScalar(-1), _camera.getUpVector());
+		ViewPlane lightPlane = new ViewPlane(lightVector.multByScalar(-1),_camera.getUpVector());
+		
 		Vector3D vx = lightPlane.getVx();
 		Vector3D vy = lightPlane.getVy();
 		
@@ -175,7 +176,7 @@ public class SceneGenerator
 		Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius())).sub(vy.multByScalar(lgt.getLightRadius()));
 		
 		// TODO: multiply in density?
-		double stepSize = (2*lgt.getLightRadius() / _settings.getShadowRays());
+		double stepSize = 2*(lgt.getLightRadius() / _settings.getShadowRays());
 		Vector3D xStep = vx.multByScalar(stepSize);
 		Vector3D yStep = vy.multByScalar(stepSize);
 		Vector3D yPosition = startPoint;
@@ -206,11 +207,11 @@ public class SceneGenerator
 	
 	private double rayHits(Vector3D origin, Vector3D point, Surface surface)
 	{
-		Ray ray = new Ray(origin, point, EPSILON);
+		Ray ray = new Ray(point, origin);
 		
 		ArrayList<Intersection> intersections = getIntersectionsSorted(ray);
 		
-		if (intersections.size() == 0 /*|| intersections.get(0).getSurface() == surface*/)
+		if (intersections.size() == 0)
 		{
 			return 1.0;
 		}
@@ -219,15 +220,29 @@ public class SceneGenerator
 		double distanceFromOther = first.getIntersectionPoint().sub(point).size();
 		double distanceFromSurface = origin.sub(point).size();
 		
-		if (distanceFromOther > distanceFromSurface || Math.abs(distanceFromOther - distanceFromSurface) < EPSILON)
+		if ((distanceFromOther > distanceFromSurface) ||
+			(Math.abs(distanceFromOther - distanceFromSurface) < EPSILON))
 		{
 			return 1.0;
 		}
+		
 		else
 		{ //There are objects between the origin and the (light) point
 			double totalTransperancy = 1.0;
 			for (Intersection intersection: intersections)
 			{
+				if (intersection.getSurface() == surface)
+				{
+					continue;
+				}
+				
+				distanceFromOther = intersection.getIntersectionPoint().sub(point).size();
+				
+				if (distanceFromOther > distanceFromSurface)
+				{
+					continue;
+				}
+				
 				Material material = getMaterialForSurface(intersection.getSurface());
 				totalTransperancy *= material.getTransperancy();
 			}
