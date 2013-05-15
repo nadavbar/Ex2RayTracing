@@ -168,9 +168,11 @@ public class SceneGenerator
 		Vector3D vx = lightPlane.getVx();
 		Vector3D vy = lightPlane.getVy();
 		
-		Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius()/2)).sub(vy.multByScalar(lgt.getLightRadius()/2));
 
-		double stepSize = (lgt.getLightRadius() / _settings.getShadowRays());
+		Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius()*2)).sub(vy.multByScalar(lgt.getLightRadius()*2));
+		
+		// TODO: multiply in density?
+		double stepSize = (lgt.getLightRadius()*4 / _settings.getShadowRays());
 		Vector3D xStep = vx.multByScalar(stepSize);
 		Vector3D yStep = vy.multByScalar(stepSize);
 		Vector3D yPosition = startPoint;
@@ -181,19 +183,11 @@ public class SceneGenerator
 			Vector3D xPosition = yPosition;
 			for (int j=0; j< _settings.getShadowRays(); j++)
 			{
-				Vector3D point = null;
-				
-				if (i == _settings.getShadowRays() /2 && j == _settings.getShadowRays() / 2 )
-				{
-					point = lgt.getPosition();
-				}
-				else 
-				{
-					double xRand = _random.nextDouble();
-					double yRand = _random.nextDouble();
+				double xRand = _random.nextDouble();
+				double yRand = _random.nextDouble();
 					
-					point = xPosition.add(xStep.multByScalar(xRand)).add(yStep.multByScalar(yRand));
-				}
+				Vector3D point = xPosition.add(xStep.multByScalar(xRand)).add(yStep.multByScalar(yRand));
+				
 				
 				// TODO: check if the light hits the object from this point
 				numberOfHits += rayHits(intersection.getIntersectionPoint(),point, intersection.getSurface());
@@ -213,7 +207,7 @@ public class SceneGenerator
 		
 		ArrayList<Intersection> intersections = getIntersectionsSorted(ray);
 		
-		if (intersections.size() == 0 || intersections.get(0).getSurface() == surface)
+		if (intersections.size() == 0 /*|| intersections.get(0).getSurface() == surface*/)
 		{
 			return 1.0;
 		}
@@ -227,9 +221,14 @@ public class SceneGenerator
 			return 1.0;
 		}
 		else
-		{
-			Material material = getMaterialForSurface(first.getSurface());
-			return material.getTransperancy();
+		{ //There are objects between the origin and the (light) point
+			double totalTransperancy = 1.0;
+			for (Intersection intersection: intersections)
+			{
+				Material material = getMaterialForSurface(intersection.getSurface());
+				totalTransperancy *= material.getTransperancy();
+			}
+			return totalTransperancy;
 		}
 	}
 	
