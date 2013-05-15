@@ -169,10 +169,10 @@ public class SceneGenerator
 		Vector3D vy = lightPlane.getVy();
 		
 
-		Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius()*2)).sub(vy.multByScalar(lgt.getLightRadius()*2));
+		Vector3D startPoint = lgt.getPosition().sub(vx.multByScalar(lgt.getLightRadius())).sub(vy.multByScalar(lgt.getLightRadius()));
 		
 		// TODO: multiply in density?
-		double stepSize = (lgt.getLightRadius()*4 / _settings.getShadowRays());
+		double stepSize = (2*lgt.getLightRadius() / _settings.getShadowRays());
 		Vector3D xStep = vx.multByScalar(stepSize);
 		Vector3D yStep = vy.multByScalar(stepSize);
 		Vector3D yPosition = startPoint;
