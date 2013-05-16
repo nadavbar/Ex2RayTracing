@@ -1,5 +1,8 @@
 package RayTracing;
 
+/**
+ * Represents an abstract surface. All supported surfaces should extend this class.
+ */
 public abstract class Surface
 {
 	/** An epsilon value used for intersection calculation */

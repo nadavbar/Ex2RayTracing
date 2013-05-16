@@ -1,7 +1,7 @@
 package RayTracing;
 
 /**
- * A color with R, G, B components
+ * A color object with R, G, B components
  */
 public class Color 
 {
