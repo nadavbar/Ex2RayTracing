@@ -83,97 +83,102 @@ public class RayTracer {
 		FileReader fr = new FileReader(sceneFileName);
 
 		BufferedReader r = new BufferedReader(fr);
-		String line = null;
-		int lineNum = 0;
-		System.out.println("Started parsing scene file " + sceneFileName);
-
-		while ((line = r.readLine()) != null)
+		
+		try 
 		{
-			line = line.trim();
-			++lineNum;
-
-			if (line.isEmpty() || (line.charAt(0) == '#'))
-			{  // This line in the scene file is a comment
-				continue;
-			}
-			else
+			String line = null;
+			int lineNum = 0;
+			System.out.println("Started parsing scene file " + sceneFileName);
+	
+			while ((line = r.readLine()) != null)
 			{
-				String code = line.substring(0, 3).toLowerCase();
-				// Split according to white space characters:
-				String[] params = line.substring(3).trim().toLowerCase().split("\\s+");
-
-				if (code.equals("cam"))
-				{
-					camera = new Camera(vectorFromParams(params, 0),
-							vectorFromParams(params, 3),
-							vectorFromParams(params, 6),
-							parseDouble(params, 9), parseDouble(params, 10));
-					System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
-				}
-				else if (code.equals("set"))
-				{
-					settings = new Settings(colorFromParams(params, 0), 
-							Integer.parseInt(params[3]), Integer.parseInt(params[4]));
-					System.out.println(String.format("Parsed general settings (line %d)", lineNum));
-				}
-				else if (code.equals("mtl"))
-				{
-					Material material = new Material(colorFromParams(params, 0),
-							colorFromParams(params, 3),
-							colorFromParams(params, 6),
-							parseDouble(params, 9),
-							parseDouble(params, 10),
-							parseDouble(params, 11));
-					materials.add(material);
-					System.out.println(String.format("Parsed material (line %d)", lineNum));
-				}
-				else if (code.equals("sph"))
-				{
-					Sphere sph = new Sphere(parseDouble(params, 0),
-							parseDouble(params, 1),
-							parseDouble(params, 2),
-							parseDouble(params, 3),
-							Integer.parseInt(params[4]));
-					
-					surfaces.add(sph);
-
-					System.out.println(String.format("Parsed sphere (line %d)", lineNum));
-				}
-				else if (code.equals("pln"))
-				{
-					Plane pln = new Plane(vectorFromParams(params, 0), 
-							parseDouble(params, 3),
-							Integer.parseInt(params[4]));
-					surfaces.add(pln);
-					System.out.println(String.format("Parsed plane (line %d)", lineNum));
-				}
-				else if (code.equals("lgt"))
-				{
-					Light lgt = new Light(vectorFromParams(params, 0), 
-							colorFromParams(params, 3),
-							parseDouble(params, 6),
-							parseDouble(params, 7),
-							parseDouble(params, 8));
-					lights.add(lgt);
-					System.out.println(String.format("Parsed light (line %d)", lineNum));
+				line = line.trim();
+				++lineNum;
+	
+				if (line.isEmpty() || (line.charAt(0) == '#'))
+				{  // This line in the scene file is a comment
+					continue;
 				}
 				else
 				{
-					System.out.println(String.format("ERROR: Did not recognize object: %s (line %d)", code, lineNum));
+					String code = line.substring(0, 3).toLowerCase();
+					// Split according to white space characters:
+					String[] params = line.substring(3).trim().toLowerCase().split("\\s+");
+	
+					if (code.equals("cam"))
+					{
+						camera = new Camera(vectorFromParams(params, 0),
+								vectorFromParams(params, 3),
+								vectorFromParams(params, 6),
+								parseDouble(params, 9), parseDouble(params, 10));
+						System.out.println(String.format("Parsed camera parameters (line %d)", lineNum));
+					}
+					else if (code.equals("set"))
+					{
+						settings = new Settings(colorFromParams(params, 0), 
+								Integer.parseInt(params[3]), Integer.parseInt(params[4]));
+						System.out.println(String.format("Parsed general settings (line %d)", lineNum));
+					}
+					else if (code.equals("mtl"))
+					{
+						Material material = new Material(colorFromParams(params, 0),
+								colorFromParams(params, 3),
+								colorFromParams(params, 6),
+								parseDouble(params, 9),
+								parseDouble(params, 10),
+								parseDouble(params, 11));
+						materials.add(material);
+						System.out.println(String.format("Parsed material (line %d)", lineNum));
+					}
+					else if (code.equals("sph"))
+					{
+						Sphere sph = new Sphere(parseDouble(params, 0),
+								parseDouble(params, 1),
+								parseDouble(params, 2),
+								parseDouble(params, 3),
+								Integer.parseInt(params[4]));
+						
+						surfaces.add(sph);
+	
+						System.out.println(String.format("Parsed sphere (line %d)", lineNum));
+					}
+					else if (code.equals("pln"))
+					{
+						Plane pln = new Plane(vectorFromParams(params, 0), 
+								parseDouble(params, 3),
+								Integer.parseInt(params[4]));
+						surfaces.add(pln);
+						System.out.println(String.format("Parsed plane (line %d)", lineNum));
+					}
+					else if (code.equals("lgt"))
+					{
+						Light lgt = new Light(vectorFromParams(params, 0), 
+								colorFromParams(params, 3),
+								parseDouble(params, 6),
+								parseDouble(params, 7),
+								parseDouble(params, 8));
+						lights.add(lgt);
+						System.out.println(String.format("Parsed light (line %d)", lineNum));
+					}
+					else
+					{
+						System.out.println(String.format("ERROR: Did not recognize object: %s (line %d)", code, lineNum));
+					}
 				}
 			}
+			
+			if (!validateScene(camera, settings, materials, surfaces, lights))
+			{
+				System.out.println("Given scene isn't valid, exiting");
+			}
+			
+			_sceneGenerator = new SceneGenerator(camera, settings, materials, surfaces, lights,
+												_imageWidth, _imageHeight);
 		}
-		
-		if (!validateScene(camera, settings, materials, surfaces, lights))
+		finally
 		{
-			System.out.println("Given scene isn't valid, exiting");
+			r.close();
 		}
-		
-		// TODO: check that the scene is valid!!!!
-		_sceneGenerator = new SceneGenerator(camera, settings, materials, surfaces, lights,
-											_imageWidth, _imageHeight);
-		
-		r.close();
 		
 		System.out.println("Finished parsing scene file " + sceneFileName);
 
